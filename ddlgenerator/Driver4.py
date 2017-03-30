@@ -10,7 +10,7 @@ class Driver4():
 
         entity_one_dict = {}
         entity_one_attr_list = []
-        entity_one_attr_list.append({'type':'varchar(32)', 'id':'1', 'name':'ItemNumber'})
+        entity_one_attr_list.append({'type':'string', 'id':'1', 'name':'ItemNumber'})
         entity_one_dict['attribute'] = entity_one_attr_list
         entity_one_dict['id']='1'
         entity_one_dict['name']='ITEM'
@@ -47,7 +47,7 @@ class Driver4():
         relation_attr_list.append({'max_participation':'N', 'entity_id':'1', 'min_participation':'1'})
         relation_attr_list.append({'max_participation':'N', 'entity_id':'2', 'min_participation':'1'})
         relation_attr_list.append({'max_participation':'N', 'entity_id':'3', 'min_participation':'1'})
-        relation_attr_list.append({'name':'QtyShipped ', 'type':'integer'})
+        relation_attr_list.append({'name':'QtyShipped ', 'type':'int'})
 
         relation_list=[]
         relation_one_dict = {}
@@ -61,7 +61,9 @@ class Driver4():
         dict['relation'] = relation_list
 
         ddlObject = DDLGenerator()
-        ddlObject.generate_ddl(dict, False, "psql")
+        new_dict = ddlObject.fill_missing_type(dict, True, 'psql')
+        print new_dict
+        ddlObject.generate_ddl(new_dict, "psql")
 
 if __name__ == "__main__":
         Driver4()
