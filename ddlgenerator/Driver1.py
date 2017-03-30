@@ -10,7 +10,7 @@ class Driver1():
 
         entity_one_dict = {}
         entity_one_attr_list = []
-        entity_one_attr_list.append({'type':'numeric', 'id':'1', 'name':'Salary'})
+        entity_one_attr_list.append({'id':'1', 'name':'Salary'})
         entity_one_attr_list.append({'id':'2', 'name':'Address'})
         entity_one_attr_list.append({'id':'3', 'name':'FirstName'})
         entity_one_attr_list.append({'id':'4', 'name':'LastName'})
@@ -23,7 +23,7 @@ class Driver1():
 
         entity_two_dict = {}
         entity_two_attr_list = []
-        entity_two_attr_list.append({'id':'1', 'name':'Location'})
+        entity_two_attr_list.append({'id':'1', 'name':'int'})
         entity_two_attr_list.append({'id':'2', 'name':'Name'})
         entity_two_dict['attribute']=entity_two_attr_list
         entity_two_dict['id']='2'
@@ -39,7 +39,7 @@ class Driver1():
         relation_attr_list = []
         relation_attr_list.append({'max_participation':'N', 'entity_id':'1', 'min_participation':'1'})
         relation_attr_list.append({'max_participation':'N', 'entity_id':'2', 'min_participation':'1'})
-        relation_attr_list.append({'name':'Date', 'type':'date'})
+        relation_attr_list.append({'name':'Date'})
 
         relation_list=[]
         relation_one_dict = {}
@@ -53,7 +53,9 @@ class Driver1():
         dict['relation'] = relation_list
 
         ddlObject = DDLGenerator()
-        ddlObject.generate_ddl(dict, False, "psql")
+        new_dict = ddlObject.fill_missing_type(dict, True, 'psql')
+        print new_dict
+        ddlObject.generate_ddl(new_dict, "psql")
 
 if __name__ == "__main__":
         Driver1()

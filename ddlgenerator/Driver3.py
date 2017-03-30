@@ -49,9 +49,9 @@ class Driver3():
 
         entity_four_dict = {}
         entity_four_attr_list = []
-        entity_four_attr_list.append({'id': '1', 'name': 'id', 'type':'varchar(16)'})
+        entity_four_attr_list.append({'id': '1', 'name': 'id', 'type':'string'})
         entity_four_attr_list.append({'id': '2', 'name': 'content'})
-        entity_four_attr_list.append({'id': '3', 'name': 'number', 'type': 'INTEGER'})
+        entity_four_attr_list.append({'id': '3', 'name': 'number', 'type': 'int'})
         entity_four_attr_list.append({'id': '4', 'relation_id': '2'})
         entity_four_dict['attribute'] = entity_four_attr_list
         entity_four_dict['id'] = '4'
@@ -70,7 +70,7 @@ class Driver3():
         relation_one_attr_list = []
         relation_one_attr_list.append({'max_participation': 'N', 'entity_id': '1', 'min_participation': '0'})
         relation_one_attr_list.append({'max_participation': 'N', 'entity_id': '2', 'min_participation': '0'})
-        relation_one_attr_list.append({'name': 'date', 'type': 'DATE'})
+        relation_one_attr_list.append({'name': 'date', 'type': 'date'})
         relation_one_dict['attribute']=relation_one_attr_list
         relation_one_dict['id']='1'
         relation_one_dict['name'] = 'register'
@@ -99,7 +99,10 @@ class Driver3():
         dict['relation'] = relation_list
 
         ddlObject = DDLGenerator()
-        ddlObject.generate_ddl(dict, False, "psql")
+        new_dict = ddlObject.fill_missing_type(dict, True, 'psql')
+        print new_dict
+        ddlObject.generate_ddl(new_dict, "psql")
+
 
 if __name__ == "__main__":
         Driver3()
