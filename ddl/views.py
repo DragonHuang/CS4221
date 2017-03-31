@@ -13,9 +13,7 @@ from .parse import parseXML
 
 from ddlgenerator.DDLGenerator import DDLGenerator
 
-# Create your views here.
 def index(request):
-    # return HttpResponse("Hello, world. You're at the polls index.")
     return HttpResponseRedirect('/ddl/upload') 
 
 
@@ -43,7 +41,6 @@ def finish(request):
 
 
 def todo(request):
-    # return HttpResponse("Hello, world. You're at the polls index.")
     return HttpResponse("todo")
 
 def confirm(request):
