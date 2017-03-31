@@ -1,0 +1,140 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Entity-relationship to SQL DDL Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dropdown.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'font-awesome/css/font-awesome.min.css' %}" />
+
+    <script type="text/javascript" src="{% static 'js/jquery-1.10.2.min.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'js/he.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+</head>
+<body>
+
+<div class="container">
+
+<div class="page-header">
+    <h1>CS4221 <small>Entity-relationship to SQL DDL Generator</small></h1>
+</div>
+
+<!-- Bootstrap Upload Control - START -->
+<div class="container">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <form id="form" method="post" enctype="multipart/form-data" action="/ddl/confirm" novalidate>
+            {% csrf_token %}
+            {{form}}
+            <!--<input type="file" id="files" name="files" multiple="multiple"/>-->
+             <!--<div class="checkbox">
+                <label>
+                <input type="checkbox" name="Smart Parsing" value="1" /> Smart Parsing
+                </label>
+                <label>
+                <input type="checkbox" name="Comformation before finishing" value="2" /> Comformation before finishing
+                </label>
+            </div>-->
+            <div id="selection"> </div>
+            
+            <p style="text-align: right; margin-top: 20px;">
+                <input type="submit" value="Upload Files" class="btn btn-lg btn-primary" />
+            </p>
+        </form>
+    </div>
+    <div class="col-md-4"></div>
+</div>
+
+<!-- you need to include the ShieldUI CSS and JS assets in order for the Upload widget to work -->
+<link rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/light-bootstrap/all.min.css" />
+<script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
+
+<script type="text/javascript">
+    jQuery(function ($) {
+        ER = '{{ER}}';
+        DB = '{{DB}}'
+        ER = he.decode(ER);
+        ER = JSON.parse(ER);
+
+        console.log(ER);
+        data = {};
+        $("#data").hide();
+
+        list = "";
+
+        switch(DB) {
+            case "psql":
+                list = '<ul><li><a href="#">VARCHAR(32)</a></li><li><a href="#">INTEGER</a></li><li><a href="#">REAL</a></li><li><a href="#">DOUBLE PRECISION</a></li><li><a href="#">DATE</a></li><li><a href="#">TIME</a></li><li><a href="#">TIMESTAMP</a></li></ul>';
+                break;
+            case "mysql":
+                list = '<ul><li><a href="#">VARCHAR(32)</a></li><li><a href="#">INT</a></li><li><a href="#">FLOAT</a></li><li><a href="#">DOUBLE</a></li><li><a href="#">DATE</a></li><li><a href="#">DATETIME</a></li><li><a href="#">TIMESTAMP</a></li></ul>';
+                break;
+            case "oracle":
+                list = '<ul><li><a href="#">VARCHAR2</a></li><li><a href="#">NUMBER</a></li><li><a href="#">NUMBER</a></li><li><a href="#">NUMBER</a></li><li><a href="#">DATE</a></li><li><a href="#">DATE</a></li><li><a href="#">TIMESTAMP</a></li></ul>';
+                break;
+            case "mssql":
+                list = '<ul><li><a href="#">VARCHAR(32)</a></li><li><a href="#">INT</a></li><li><a href="#">REAL</a></li><li><a href="#">FLOAT</a></li><li><a href="#">VARCHAR(64)</a></li><li><a href="#">VARCHAR(64)</a></li><li><a href="#">ROWVERSION</a></li></ul>';
+                break;
+            default:
+        }
+
+        var i = 0;
+        var j = 0;
+
+        for(i=0; i< ER.entity.length;i++){
+            var entity = ER.entity[i];
+            $("#selection").append("<p>"+entity.name+"</p><div>")
+            for(j=0; j<entity.attribute.length;j++){
+                var attr = entity.attribute[j];
+                if(typeof attr.type != "undefined")
+                $("#selection").append('<div class="dropdown" id="'+entity.name+'_'+attr.id+'">'+attr.name+' <p>'+attr.type+'</p>'+list+'</div> ');
+            }
+            $("#selection").append("</div>");
+        }
+            
+
+            
+
+
+        $(".dropdown p").click(function(){ 
+            id = $(this).closest("div")[0].id;
+            var ul = $("#"+id+" ul"); 
+            if(ul.css("display")=="none"){ 
+                ul.slideDown("fast"); 
+            }else{ 
+                ul.slideUp("fast"); 
+            } 
+        }); 
+
+        $(".dropdown ul li a").click(function(){ 
+            id = $(this).closest("div")[0].id;
+            var txt = $(this).text(); 
+            $("#"+id+" p").html(txt); 
+            $("#"+id+" ul").hide(); 
+
+            console.log(id);
+            console.log(txt);
+            id = id.split('_');
+
+            data[id[0]] = [];
+            data[id[0]][id[1]] = txt;
+
+            console.log(JSON.stringify(data));
+
+            $("#data").val(JSON.stringify(data));
+        }); 
+    });
+
+
+</script>
+<!-- Bootstrap Upload Control - END -->
+
+</div>
+
+</body>
+</html>

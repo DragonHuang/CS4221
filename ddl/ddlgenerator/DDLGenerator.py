@@ -386,9 +386,9 @@ class DDLGenerator():
         ddl = ddl[:-2]
         ddl += "\n);"
 
-        print '\n'
-        print ddl
-        print '\n'
+        # print '\n'
+        # print ddl
+        # print '\n'
         return ddl
 
     def get_entity_attr_name_type(self, attr_id_to_name_dict, attribute_dict, ddl, id):

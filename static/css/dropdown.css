@@ -1,0 +1,41 @@
+.dropdown {
+    width: 200px;
+    margin: 20px auto;
+    position: relative;
+}
+.dropdown p {
+    width: 200px;
+    height: 20px;
+    line-height: 24px;
+    padding-left: 4px;
+    padding-right: 30px;
+    border: 1px solid #a9c9e2;
+    color: #807a62;
+    cursor: pointer;
+    z-index: 200;
+}
+.dropdown ul {
+    width: 200px;
+    background: #e8f5fe;
+    border: 1px solid #a9c9e2;
+    position: absolute;
+    display: none;
+    z-index: 800;
+}
+.dropdown ul li {
+    height: 24px;
+    line-height: 24px;
+    text-indent: 10px;
+    z-index: 1000;
+}
+.dropdown ul li a {
+    display: block;
+    height: 24px;
+    color: #807a62;
+    text-decoration: none;
+    z-index: 1000;
+}
+.dropdown ul li a:hover {
+    background: #c6dbfc;
+    color: #369
+}
