@@ -1,11 +1,7 @@
 import xml.etree.ElementTree as ET
 
-def handle_uploaded_file(f):
-    with open('temp.txt', 'wb+') as destination:
-        for chunk in f.chunks():
-            destination.write(chunk)
-    destination.close();
-    tree = ET.parse('temp.txt')
+def parseXML(f):
+    tree = ET.parse(f)
     root = tree.getroot()
     
     # xmlstr = ET.tostring(root, encoding='utf8', method='xml')

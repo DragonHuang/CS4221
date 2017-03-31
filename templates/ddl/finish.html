@@ -11,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'font-awesome/css/font-awesome.min.css' %}" />
 
     <script type="text/javascript" src="{% static 'js/jquery-1.10.2.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/he.js' %}"></script>
     <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 </head>
 <body>
@@ -23,24 +24,9 @@
 
 <!-- Bootstrap Upload Control - START -->
 <div class="container">
-    <div class="col-md-4"></div>
-    <div class="col-md-4">
-        <form method="post" enctype="multipart/form-data" action="/ddl/upload">
-            {% csrf_token %}
-            {{ form }}
-            <!--<input type="file" id="files" name="files" multiple="multiple"/>-->
-             <!--<div class="checkbox">
-                <label>
-                <input type="checkbox" name="Smart Parsing" value="1" /> Smart Parsing
-                </label>
-                <label>
-                <input type="checkbox" name="Comformation before finishing" value="2" /> Comformation before finishing
-                </label>
-            </div>-->
-            <p style="text-align: right; margin-top: 20px;">
-                <input type="submit" value="Upload Files" class="btn btn-lg btn-primary" />
-            </p>
-        </form>
+    <h4>Result:</h4>
+
+    <div class="col-md-12" id=result>
     </div>
     <div class="col-md-4"></div>
 </div>
@@ -48,15 +34,21 @@
 <!-- you need to include the ShieldUI CSS and JS assets in order for the Upload widget to work -->
 <link rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/light-bootstrap/all.min.css" />
 <script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
+<!-- Bootstrap Upload Control - END -->
 
 <script type="text/javascript">
     jQuery(function ($) {
-        $("#files").shieldUpload();
+        var result = '{{ result }}';
+        function escapeRegExp(str) {
+            return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+        }
+        result = he.decode(result).replace(new RegExp(escapeRegExp("###"), 'g'), "<br>");
+        result = result.replace(new RegExp(escapeRegExp("****"), 'g'), "&nbsp;&nbsp;&nbsp;&nbsp;");
+        $("#result").append(result);
     });
+
+
 </script>
-<!-- Bootstrap Upload Control - END -->
-
-
 </div>
 
 </body>

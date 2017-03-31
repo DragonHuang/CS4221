@@ -284,7 +284,6 @@ class DDLGenerator():
 
 
     def check_for_same_attribute_names_entity(self,entity_dict, attr_name_counter_dict):
-
         entity_name = entity_dict['name'].strip()
         attr_dict_list = entity_dict['attribute']
 
@@ -390,6 +389,7 @@ class DDLGenerator():
         print '\n'
         print ddl
         print '\n'
+        return ddl
 
     def get_entity_attr_name_type(self, attr_id_to_name_dict, attribute_dict, ddl, id):
 
@@ -684,7 +684,7 @@ class DDLGenerator():
 
         ddl = ddl[:-2]
         ddl += "\n);"
-        print ddl
+        # print ddl
         return ddl
 
     def check_for_keyword(self, str):
