@@ -1,4 +1,5 @@
 import re
+import bcnf
 
 class DDLGenerator():
 
@@ -739,6 +740,7 @@ class DDLGenerator():
         self.entity_id_name_dict = {}
         self.table_primary_key_dict={}
         self.database = ''
+        self.Database = bcnf.Database()
 
         self.reserved_keywords = []
         self.psql_keywords = ['ALL','ANALYSE','ANALYZE','AND','ANY','AS','ASC','AUDIT','BETWEEN',
