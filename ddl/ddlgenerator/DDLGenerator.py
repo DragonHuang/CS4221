@@ -375,8 +375,6 @@ class DDLGenerator():
         ddl, foreign_key_str, foreign_key_str_list, primary_key_str, unique_str = self.find_primary_foreign_keys(
             attr_id_to_name_dict, ddl, entity_dict, table_name, unique_str, entities_list, table)
 
-        print table.attributes
-
         if primary_key_str != "":
             ddl += primary_key_str
 

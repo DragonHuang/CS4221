@@ -111,7 +111,7 @@ def upload_file(request):
             else:
                 ER = ddlObject.fill_missing_type(ER, smart, Database)
                 DDL = ddlObject.generate_ddl(ER, Database)
-                print(ddlObject.Database.drived_fdset().attributes)
+                print(ddlObject.Database.drived_fdset().is_bcnf())
                 with open('IO/DDL', 'wb') as output:
                     pickle.dump(DDL, output, pickle.HIGHEST_PROTOCOL)
                 output.close()

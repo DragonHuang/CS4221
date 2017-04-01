@@ -20,6 +20,16 @@ class Database:
                     continue
                 attributes.append(tableName + "." + attribute[0])
         fdset = FunctionalDependencySet(attributes)
+        for tableName in self.tables:
+            tableKey = [tableName + "." + key for key in self.tables[tableName].primary_keys]
+            for attribute in self.tables[tableName].attributes:
+                if attribute[0] in self.tables[tableName].refrenced_attributes:
+                    for foreign_key in self.tables[tableName].foreign_keys:
+                        if attribute[0] in foreign_key[0]:
+                            fdset.add_dependency(tableKey, [foreign_key[1] + "." + key for key in foreign_key[2]])
+                            break
+                else:
+                    fdset.add_dependency(tableKey, [tableName + "." + attribute[0]])
         return fdset
 
 class Table:

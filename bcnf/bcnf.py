@@ -18,7 +18,10 @@ class FunctionalDependencySet:
         for i in chain(x, y):
             if i not in self.attributes:
                 raise Exception("Attribute " + i + " does not exist")
-        self.dependencies.append((set(x), set(y)))
+        x = set(x)
+        y = set(y)
+        if not y.issubset(x):
+            self.dependencies.append((set(x), set(y)))
 
     def get_attr_closure(self, attr):
         closure = set(attr)
