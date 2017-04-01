@@ -375,7 +375,7 @@ class DDLGenerator():
         ddl, foreign_key_str, foreign_key_str_list, primary_key_str, unique_str = self.find_primary_foreign_keys(
             attr_id_to_name_dict, ddl, entity_dict, table_name, unique_str, entities_list, table)
 
-        print table.foreign_keys
+        print table.attributes
 
         if primary_key_str != "":
             ddl += primary_key_str
@@ -498,6 +498,7 @@ class DDLGenerator():
                         for i in range(0, len(attr_name_list)):
                             ddl += "    " + attr_name_list[i].strip().replace(" ", "_") + " " + attr_type_list[
                                 i] + ",\n"
+                            table.add_attribute(attr_name_list[i].strip().replace(" ", "_"), attr_type_list[i])
                             foreign_key_str += attr_name_list[i].strip().replace(" ", "_") + ", "
                             foreign_key_this_attrs.append(attr_name_list[i].strip().replace(" ", "_"))
                             key_type_pair.append(attr_name_list[i])
@@ -546,6 +547,7 @@ class DDLGenerator():
                                 attr_name = attr_name_list[j]
                                 attr_type = attr_type_list[j]
                                 ddl += "    " + attr_name.strip().replace(" ", "_") + " " + attr_type + ",\n"
+                                table.add_attribute(attr_name.strip().replace(" ", "_"), attr_type)
                                 unique_str += attr_name.strip().replace(" ", "_") + ", "
 
                                 foreign_key_list.append(attr_name)

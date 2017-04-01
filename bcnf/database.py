@@ -1,3 +1,5 @@
+from bcnf import FunctionalDependencySet
+
 class Database:
     def __init__(self):
         self.tables = {}
@@ -7,8 +9,16 @@ class Database:
         self.tables[name] = table
         return table
 
-    def get_table(name):
+    def get_table(self, name):
         return self.tables[name]
+
+    def drived_fdset(self):
+        attributes = []
+        for tableName in self.tables:
+            for attribute in self.tables[tableName].attributes:
+                attributes.append(tableName + "." + attribute[0])
+        fdset = FunctionalDependencySet(attributes)
+        return fdset
 
 class Table:
     def __init__(self, table_name):
