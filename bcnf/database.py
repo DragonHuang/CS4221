@@ -16,6 +16,8 @@ class Database:
         attributes = []
         for tableName in self.tables:
             for attribute in self.tables[tableName].attributes:
+                if attribute[0] in self.tables[tableName].refrenced_attributes:
+                    continue
                 attributes.append(tableName + "." + attribute[0])
         fdset = FunctionalDependencySet(attributes)
         return fdset
@@ -25,6 +27,7 @@ class Table:
         self.table_name = table_name
         self.attributes = []
         self.primary_keys = []
+        self.refrenced_attributes = []
         self.foreign_keys = []
 
     def add_attribute(self, name, type):
@@ -34,4 +37,6 @@ class Table:
         self.primary_keys.append(attr)
 
     def add_foreign_key(self, this_attrs, that_table_name, that_attrs):
+        for attr in this_attrs:
+            self.refrenced_attributes.append(attr)
         self.foreign_keys.append((tuple(this_attrs), that_table_name, tuple(that_attrs)))
