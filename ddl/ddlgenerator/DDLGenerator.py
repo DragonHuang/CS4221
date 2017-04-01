@@ -347,6 +347,7 @@ class DDLGenerator():
 
         table_name = entity_dict['name']
         self.check_for_keyword(table_name)
+        table = self.Database.set_table(table_name.strip().replace(" ", "_"))
         ddl = "CREATE TABLE " + table_name.strip().replace(" ", "_") + " (\n"
 
         entity_id = entity_dict['id']
@@ -360,19 +361,21 @@ class DDLGenerator():
             id = attribute_dict['id']
 
             if 'name' in attribute_dict:
-                ddl = self.get_entity_attr_name_type(attr_id_to_name_dict, attribute_dict, ddl, id)
+                ddl = self.get_entity_attr_name_type(attr_id_to_name_dict, attribute_dict, ddl, id, table)
 
             elif 'foreign_entity_id' in attribute_dict:
-                ddl = self.handle_merged_relationship(attribute_dict, entities_list, relations_list, ddl)
+                ddl = self.handle_merged_relationship(attribute_dict, entities_list, relations_list, ddl, table)
 
             elif 'relation_id' in attribute_dict:
                 ddl = self.handle_weak_entity_relationship(attr_id_to_name_dict, attribute_dict, ddl, entity_id, id,
-                                                           relations_list)
+                                                           relations_list, table)
             else:
                 pass
 
         ddl, foreign_key_str, foreign_key_str_list, primary_key_str, unique_str = self.find_primary_foreign_keys(
-            attr_id_to_name_dict, ddl, entity_dict, table_name, unique_str, entities_list)
+            attr_id_to_name_dict, ddl, entity_dict, table_name, unique_str, entities_list, table)
+
+        print table.foreign_keys
 
         if primary_key_str != "":
             ddl += primary_key_str
@@ -392,7 +395,7 @@ class DDLGenerator():
         # print '\n'
         return ddl
 
-    def get_entity_attr_name_type(self, attr_id_to_name_dict, attribute_dict, ddl, id):
+    def get_entity_attr_name_type(self, attr_id_to_name_dict, attribute_dict, ddl, id, table):
 
         attr_name = attribute_dict['name']
         self.check_for_keyword(attr_name)
@@ -407,11 +410,12 @@ class DDLGenerator():
             ddl += "    " + attr_name.strip().replace(" ", "_") + " " + attr_type + " " + attribute_dict['reference'] + ",\n"
         else:
             ddl += "    " + attr_name.strip().replace(" ", "_") + " " + attr_type + ",\n"
+        table.add_attribute(attr_name.strip().replace(" ", "_"), attr_type)
 
         attr_id_to_name_dict[id] = attr_name_type_pair
         return ddl
 
-    def handle_merged_relationship(self, attribute_dict, entities_list, relations_list, ddl):
+    def handle_merged_relationship(self, attribute_dict, entities_list, relations_list, ddl, table):
 
         foreign_identity_id = attribute_dict['foreign_entity_id']
 
@@ -426,6 +430,7 @@ class DDLGenerator():
                     type = primary_key_attr_type_list[i]
 
                     ddl += "    " + name + " " + type + " REFERENCES " + foreign_entity_name + " (" + name + "),\n"
+                    table.add_attribute(name, type)
 
                 break
 
@@ -466,7 +471,7 @@ class DDLGenerator():
         return name_list, type_list
 
 
-    def find_primary_foreign_keys(self, attr_id_to_name_dict, ddl, entity_dict, table_name, unique_str, entities_list):
+    def find_primary_foreign_keys(self, attr_id_to_name_dict, ddl, entity_dict, table_name, unique_str, entities_list, table):
         primary_key_str = ""
         foreign_key_str = ""
         foreign_key_str_list = []
@@ -483,14 +488,18 @@ class DDLGenerator():
                 if attr in attr_id_to_name_dict:
                     if attr_id_to_name_dict[attr][0].isdigit() == False:
                         primary_key_str += attr_id_to_name_dict[attr][0].strip().replace(" ", "_") + ", "
+                        table.add_primary_key(attr_id_to_name_dict[attr][0].strip().replace(" ", "_"))
                         primary_key_name_list.append(attr_id_to_name_dict[attr])
                     else:
                         attr_name_list, attr_type_list = self.get_strong_entity_keys(attr_id_to_name_dict[attr][0], entities_list)
+                        foreign_key_this_attrs = []
+                        foreign_key_that_attrs = []
                         foreign_key_str = "    FOREIGN KEY ("
                         for i in range(0, len(attr_name_list)):
                             ddl += "    " + attr_name_list[i].strip().replace(" ", "_") + " " + attr_type_list[
                                 i] + ",\n"
                             foreign_key_str += attr_name_list[i].strip().replace(" ", "_") + ", "
+                            foreign_key_this_attrs.append(attr_name_list[i].strip().replace(" ", "_"))
                             key_type_pair.append(attr_name_list[i])
                             key_type_pair.append(attr_type_list[i])
                             primary_key_name_list.append(key_type_pair)
@@ -498,8 +507,11 @@ class DDLGenerator():
                         foreign_key_str += ") REFERENCES " + self.strong_entity_name.strip().replace(" ", "_") + " ("
                         for attr_name in attr_name_list:
                             foreign_key_str += attr_name.strip().replace(" ", "_") + ", "
+                            foreign_key_that_attrs.append(attr_name.strip().replace(" ", "_"))
                             primary_key_str += attr_name.strip().replace(" ", "_") + ", "
+                            table.add_primary_key(attr_id_to_name_dict[attr][0].strip().replace(" ", "_"))
                         foreign_key_str = foreign_key_str[:-2]
+                        table.add_foreign_key(foreign_key_this_attrs, self.strong_entity_name.strip().replace(" ", "_"), foreign_key_that_attrs)
                         foreign_key_str += "),\n"
                         foreign_key_str_list.append(foreign_key_str)
 
@@ -512,6 +524,8 @@ class DDLGenerator():
                 unique_attr_list = key_list[i]
 
                 foreign_key_str = "    FOREIGN KEY ("
+                foreign_key_this_attrs = []
+                foreign_key_that_attrs = []
                 foreign_key_list = []
 
                 for attr in unique_attr_list:
@@ -541,17 +555,20 @@ class DDLGenerator():
 
                 for foreign_key in foreign_key_list:
                     foreign_key_str += foreign_key.strip().replace(" ", "_") + ", "
+                    foreign_key_this_attrs.append(foreign_key.strip().replace(" ", "_"))
                 foreign_key_str = foreign_key_str[:-2]
                 foreign_key_str += ") REFERENCES " + self.strong_entity_name.strip().replace(" ", "_") + " ("
 
                 for foreign_key in foreign_key_list:
                     foreign_key_str += foreign_key.strip().replace(" ", "_") + ", "
+                    foreign_key_that_attrs.append(foreign_key.strip().replace(" ", "_"))
                 foreign_key_str = foreign_key_str[:-2]
                 foreign_key_str += "),\n"
                 foreign_key_str_list.append(foreign_key_str)
+                table.add_foreign_key(foreign_key_this_attrs, self.strong_entity_name.strip().replace(" ", "_"), foreign_key_that_attrs)
         return ddl, foreign_key_str, foreign_key_str_list, primary_key_str, unique_str
 
-    def handle_weak_entity_relationship(self, attr_id_to_name_dict, attribute_dict, ddl, entity_id, id, relations_list):
+    def handle_weak_entity_relationship(self, attr_id_to_name_dict, attribute_dict, ddl, entity_id, id, relations_list, table):
         relation_id = attribute_dict['relation_id']
         temp_lst = []
         temp_lst.append(relation_id)
@@ -576,6 +593,7 @@ class DDLGenerator():
                             self.check_for_keyword(relation_attr_name)
                             relation_attr_type = relation_attr_dict['type']
                             ddl += "    " + relation_attr_name.strip().replace(" ", "_") + " " + relation_attr_type + ",\n"
+                            table.add_attribute(relation_attr_name.strip().replace(" ", "_"), relation_attr_type)
                         j = j + 1
 
                     relation_dict['processed'] = 'True'

@@ -20,8 +20,8 @@ class Table:
     def add_attribute(self, name, type):
         self.attributes.append((name, type))
 
-    def add_primary_key(self, attrs):
-        self.primary_keys.append(tuple(attrs))
+    def add_primary_key(self, attr):
+        self.primary_keys.append(attr)
 
     def add_foreign_key(self, this_attrs, that_table_name, that_attrs):
         self.foreign_keys.append((tuple(this_attrs), that_table_name, tuple(that_attrs)))
