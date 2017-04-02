@@ -13,40 +13,50 @@ class Database:
         return self.tables[name]
 
     def drived_fdset(self):
-        attributes = []
+        fdsets = {}
+        attributes = set()
         for tableName in self.tables:
-            for attribute in self.tables[tableName].attributes:
-                if attribute[0] in self.tables[tableName].refrenced_attributes:
-                    continue
-                attributes.append(tableName + "." + attribute[0])
+            fdsets[tableName] = self.tables[tableName].drived_fdset()
+        for tableName in fdsets:
+            for attr in fdsets[tableName].attributes:
+                attributes.add(attr)
         fdset = FunctionalDependencySet(attributes)
-        for tableName in self.tables:
-            tableKey = [tableName + "." + key for key in self.tables[tableName].primary_keys]
-            for attribute in self.tables[tableName].attributes:
-                if attribute[0] in self.tables[tableName].refrenced_attributes:
-                    for foreign_key in self.tables[tableName].foreign_keys:
-                        if attribute[0] in foreign_key[0]:
-                            fdset.add_dependency(tableKey, [foreign_key[1] + "." + key for key in foreign_key[2]])
-                            break
-                else:
-                    fdset.add_dependency(tableKey, [tableName + "." + attribute[0]])
+        for tableName in fdsets:
+            for dep in fdsets[tableName].dependencies:
+                fdset.add_dependency(dep[0], dep[1])
         return fdset
 
 class Table:
     def __init__(self, table_name):
         self.table_name = table_name
-        self.attributes = []
-        self.primary_keys = []
-        self.refrenced_attributes = []
-        self.foreign_keys = []
+        self.attributes = set()
+        self.primary_keys = set()
+        self.refrences = []
 
     def add_attribute(self, name, type):
-        self.attributes.append((name, type))
+        self.attributes.add(self.table_name + "." + name)
 
-    def add_primary_key(self, attr):
-        self.primary_keys.append(attr)
+    def add_primary_key(self, name):
+        self.primary_keys.add(self.table_name + "." + name)
 
     def add_foreign_key(self, this_attrs, that_table_name, that_attrs):
-        for attr in this_attrs:
-            self.refrenced_attributes.append(attr)
-        self.foreign_keys.append((tuple(this_attrs), that_table_name, tuple(that_attrs)))
+        this_attrs = set([self.table_name + "." + name for name in this_attrs])
+        that_attrs = set([that_table_name + "." + name for name in that_attrs])
+        if that_table_name != self.table_name:
+            for name in this_attrs:
+                self.attributes.remove(name)
+            for name in that_attrs:
+                self.attributes.add(name)
+        else:
+            for name in this_attrs:
+                self.attributes.add(name)
+            self.refrences.append((this_attrs, that_attrs))
+            print (this_attrs, that_attrs)
+
+    def drived_fdset(self):
+        fdset = FunctionalDependencySet(self.attributes)
+        for attr in self.attributes:
+            fdset.add_dependency(self.primary_keys, [attr])
+        for ref in self.refrences:
+            fdset.add_dependency(ref[0], ref[1])
+        return fdset
