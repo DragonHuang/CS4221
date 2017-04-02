@@ -60,10 +60,12 @@ class FunctionalDependencySet:
                     return False
         return True
 
-    def is_bcnf(self):
-        result = True
+    def check_bcnf(self):
+        result = []
         for dep in self.dependencies:
-            result = result and (dep[1].issubset(dep[0]) or self.get_attr_closure(dep[0]) == self.attributes)
+            if not (dep[1].issubset(dep[0]) or self.get_attr_closure(dep[0]) == self.attributes):
+                closure = ", ".join(self.get_attr_closure(dep[0]))
+                result.append((dep, ", ".join(dep[0]) + " is not super key. Its closure is " + closure))
         return result
 
     def get_attributes_str(self):
