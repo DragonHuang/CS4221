@@ -670,9 +670,11 @@ class DDLGenerator():
         relationship_name = relation_dict['name']
         self.check_for_keyword(relationship_name)
 
+        table = self.Database.set_table(relationship_name.strip().replace(" ", "_"))
         ddl = 'CREATE TABLE ' + relationship_name.strip().replace(" ", "_") + ' (\n'
         for pair in relationship_attr_type_pair_list:
             ddl += "    " + pair[0].strip().replace(" ", "_") + " " + pair[1] + ",\n"
+            table.add_attribute(pair[0].strip().replace(" ", "_"), pair[1])
 
         primary_key_str = "    PRIMARY KEY ("
         for id in entities_id_list:
@@ -680,19 +682,25 @@ class DDLGenerator():
                 entity_name = self.entity_id_name_dict[id]
                 if entity_name in self.table_primary_key_dict:
                     foreign_key_str = "    FOREIGN KEY ("
+                    foreign_key_this_attrs = []
+                    foreign_key_that_attrs = []
                     primary_key_list = self.table_primary_key_dict[entity_name]
                     for pair in primary_key_list:
                         ddl += "    " + pair[0].strip().replace(" ", "_") + " " + pair[1] + ",\n"
                         primary_key_str += pair[0].strip().replace(" ", "_") + ", "
+                        table.add_primary_key(pair[0].strip().replace(" ", "_"))
                         foreign_key_str += pair[0].strip().replace(" ", "_") + ", "
+                        foreign_key_this_attrs.append(pair[0].strip().replace(" ", "_"))
 
                     foreign_key_str = foreign_key_str[:-2]
                     foreign_key_str += ") REFERENCES " + entity_name + " ("
                     for pair in primary_key_list:
                         foreign_key_str += pair[0].strip().replace(" ", "_") + ", "
+                        foreign_key_that_attrs.append(pair[0].strip().replace(" ", "_"))
                     foreign_key_str = foreign_key_str[:-2]
                     foreign_key_str += "),\n"
                     foreign_key_list.append(foreign_key_str)
+                    table.add_foreign_key(foreign_key_this_attrs, entity_name, foreign_key_that_attrs)
 
         primary_key_str = primary_key_str[:-2]
         primary_key_str += "),\n"
