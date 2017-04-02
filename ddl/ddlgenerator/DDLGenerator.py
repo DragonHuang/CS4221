@@ -405,7 +405,12 @@ class DDLGenerator():
         attr_name_type_pair.append(attr_type)
 
         if 'reference' in attribute_dict:
+            left = attribute_dict['reference'].index('(')
+            right = attribute_dict['reference'].index(')')
+            attrs = attribute_dict['reference'][left+1:right]
+            attrs = [attr.strip() for attr in attrs.split(',')]
             ddl += "    " + attr_name.strip().replace(" ", "_") + " " + attr_type + " " + attribute_dict['reference'] + ",\n"
+            table.add_foreign_key([attr_name.strip().replace(" ", "_")], table.table_name, attrs)
         else:
             ddl += "    " + attr_name.strip().replace(" ", "_") + " " + attr_type + ",\n"
         table.add_attribute(attr_name.strip().replace(" ", "_"), attr_type)
