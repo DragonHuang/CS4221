@@ -3,12 +3,10 @@
    <entity name="A" id="1">
       <attribute name="name" id="1" />
       <attribute name="type" id="2" />
-      <key>1</key>
+      <key>1,2</key>
    </entity>
    <relationship name="AA" id="1">
       <attribute entity_id="1" max_participation="1" min_participation="1" />
-   </relationship>
-   <relationship name="BB" id="2">
-      <attribute entity_id="1" max_participation="1" min_participation="1" />
+      <attribute name="C"/> 
    </relationship>
 </data>
