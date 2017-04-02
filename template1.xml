@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+   <entity name="A" id="1">
+      <attribute name="name" id="1" />
+      <attribute name="type" id="2" />
+      <key>1</key>
+   </entity>
+   <entity name="B" id="2">
+      <attribute name="name" id="1" />
+      <attribute name="type" id="2" />
+      <key>1</key>
+   </entity>
+   <entity name="C" id="3">
+      <attribute name="name" id="1" />
+      <attribute name="type" id="2" />
+      <key>1</key>
+   </entity>
+   <relationship name="AB" id="1">
+      <attribute entity_id="1" max_participation="1" min_participation="1" />
+      <attribute entity_id="2" max_participation="1" min_participation="1" />
+   </relationship>
+   <relationship name="BC" id="2">
+      <attribute entity_id="2" max_participation="1" min_participation="1" />
+      <attribute entity_id="3" max_participation="1" min_participation="1" />
+   </relationship>
+   <relationship name="CA" id="3">
+      <attribute entity_id="3" max_participation="1" min_participation="1" />
+      <attribute entity_id="1" max_participation="1" min_participation="1" />
+   </relationship>
+</data>
