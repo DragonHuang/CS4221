@@ -111,7 +111,14 @@ def upload_file(request):
             else:
                 ER = ddlObject.fill_missing_type(ER, smart, Database)
                 DDL = ddlObject.generate_ddl(ER, Database)
-                DDL.append("\n\nIs in BCNF: " + str(ddlObject.Database.drived_fdset().is_bcnf()))
+                fdset = ddlObject.Database.drived_fdset()
+
+                bcnf_check = []
+                bcnf_check.append("-----------------\nIs in BCNF: " + str(fdset.is_bcnf()))
+                bcnf_check.append("Attributes: \n" + fdset.get_attributes_str())
+                bcnf_check.append("Dependencies: \n" + fdset.get_dependencies_str())
+                DDL.append('\n\n' + '\n\n'.join(bcnf_check))
+
                 with open('IO/DDL', 'wb') as output:
                     pickle.dump(DDL, output, pickle.HIGHEST_PROTOCOL)
                 output.close()

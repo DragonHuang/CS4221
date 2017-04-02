@@ -66,6 +66,15 @@ class FunctionalDependencySet:
             result = result and (dep[1].issubset(dep[0]) or self.get_attr_closure(dep[0]) == self.attributes)
         return result
 
+    def get_attributes_str(self):
+        return ", ".join(self.attributes)
+
+    def get_dependencies_str(self):
+        result = []
+        for dependencie in self.dependencies:
+            result.append(", ".join(dependencie[0]) + " --> " + ", ".join(dependencie[1]))
+        return "\n".join(result)
+
     def decompose(self):
         if self.is_decomposed:
             return
