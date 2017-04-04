@@ -29,6 +29,7 @@ class DDLGenerator():
                     attr_dict['type'] = database_type
 
     def check_relation_attribute_types(self, relation_dict, smart, database):
+
         attr_dict_list = relation_dict['attribute']
         for attr_dict in attr_dict_list:
             if 'name' in attr_dict:
@@ -140,8 +141,14 @@ class DDLGenerator():
             raise Exception('unsupported database management system: ' + database)
 
         self.generate_create_table_queries(dict)
-        return self.ddl_list
 
+        for alter_str in self.alter_table_list:
+            self.ddl_list.append(alter_str)
+
+        #for element in self.ddl_list:
+            #print element
+
+        return self.ddl_list
 
     def generate_create_table_queries(self, dict):
 
@@ -162,12 +169,11 @@ class DDLGenerator():
             self.check_for_same_attribute_names_entity(entity_dict, attr_name_counter_dict)
 
         for entity_dict in entities_list:
-            self.merge_entity_and_relationships(entity_dict, combinable_recursive_relation_dict, entity_combinable_relation_dict)
+            self.merge_entity_and_relationships(entity_dict, entities_list, relations_list, combinable_recursive_relation_dict, entity_combinable_relation_dict)
             self.ddl_list.append(self.create_table_for_entity(entity_dict, entities_list, relations_list))
 
         for relation_dict in relations_list:
             if 'processed' in relation_dict and relation_dict['processed']=='True':
-                '''print 'relation alr processed ' + str(count)'''
                 pass
             else:
                 self.ddl_list.append(self.create_table_for_relationship(relation_dict))
@@ -178,7 +184,7 @@ class DDLGenerator():
         participating_entities_count = 0
         is_weak_relationship = False
 
-        relationship_name = dict['name'].strip()
+        relationship_name = dict['name'].strip().replace(" ", "_")
         relationship_id = dict['id']
         attr_dict_list = dict['attribute']
 
@@ -190,7 +196,7 @@ class DDLGenerator():
                 is_weak_relationship = True
 
             elif 'name' in attr_dict:
-                attr_name = attr_dict['name'].strip()
+                attr_name = attr_dict['name'].strip().replace(" ", "_")
                 if attr_name in counter_dict:
                     attr_dict['name'] = relationship_name + "_" + attr_name
                     counter_dict[attr_name] = counter_dict[attr_name] + 1
@@ -263,28 +269,63 @@ class DDLGenerator():
 
                     if found == True:
                         relationship_name = relation_dict['name']
-                        relation_dict['processed'] = 'True'
 
                         for i in range(2, len(attr_dict_list)):
+                            dict = {}
                             if 'name' in attr_dict_list[i] and 'type' in attr_dict_list[i]:
-                                lst.append({'name': attr_dict_list[i]['name'], 'type': attr_dict_list[i]['type']})
+                                dict['name'] = attr_dict_list[i]['name']
+                                dict['type'] = attr_dict_list[i]['type']
+                                if 'not_null' in attr_dict_list[i] and attr_dict_list['not_null'].lower() == 'true':
+                                    dict['not_null'] = 'true'
+                                if 'unique' in attr_dict_list[i] and attr_dict_list[i]['unique'].lower() == 'true':
+                                    dict['unique'] = 'true'
 
-                        entity_combinable_relation_dict[entity_id] =  {'name':relationship_name, 'attribute':lst, 'foreign_entity_id': foreign_entity_id, 'relationship_id':relationship_id}
+                                lst.append(dict)
+
+                        entity_combinable_relation_dict[entity_id] = {'name': relationship_name, 'attribute': lst,
+                                                                      'foreign_entity_id': foreign_entity_id,
+                                                                      'relationship_id': relationship_id}
 
             else:
+                lst = []
                 entity_one_dict = attr_dict_list[0]
+                id = entity_one_dict['entity_id']
+                include = 'false'
                 relationship_name = relation_dict['name']
                 relation_dict['processed'] = 'True'
 
+                if 'min_participation' in entity_one_dict and 'max_participation' in entity_one_dict:
+                    if entity_one_dict['min_participation'] == 'N':
+                        include = 'true'
+                    else:
+                        include = 'false'
+
                 for i in range(1, len(attr_dict_list)):
+                    dict = {}
                     if 'name' in attr_dict_list[i] and 'type' in attr_dict_list[i]:
-                        lst.append({'name': attr_dict_list[i]['name'], 'type': attr_dict_list[i]['type']})
-                combinable_recursive_relation_dict[entity_one_dict['entity_id']] = {'name':relationship_name, 'attribute':lst}
+                        dict['name'] = attr_dict_list[i]['name']
+                        dict['type'] = attr_dict_list[i]['type']
+                        if 'not_null' in attr_dict_list[i] and attr_dict_list['not_null'].lower() == 'true':
+                            dict['not_null'] = 'true'
+                        if 'unique' in attr_dict_list[i] and attr_dict_list[i]['unique'].lower() == 'true':
+                            dict['unique'] = 'true'
+                        lst.append(dict)
+
+                if id in combinable_recursive_relation_dict:
+                    new_lst = []
+                    dict = combinable_recursive_relation_dict[id]
+                    new_lst.append(dict)
+                    new_lst.append({'name': relationship_name, 'attribute': lst, 'include': include})
+
+                    combinable_recursive_relation_dict[id] = new_lst
+                else:
+                    combinable_recursive_relation_dict[id] = {'name': relationship_name, 'attribute': lst, 'include': include}
 
         return entity_combinable_relation_dict, combinable_recursive_relation_dict
 
 
     def check_for_same_attribute_names_entity(self,entity_dict, attr_name_counter_dict):
+
         entity_name = entity_dict['name'].strip()
         attr_dict_list = entity_dict['attribute']
 
@@ -298,57 +339,214 @@ class DDLGenerator():
                 else:
                     attr_name_counter_dict[attr_name] = 1
 
-    def merge_entity_and_relationships(self, entity_dict, combinable_recursive_relation_dict, entity_combinable_relation_dict):
+    def merge_entity_and_relationships(self, entity_dict, entities_list, relations_list, combinable_recursive_relation_dict, entity_combinable_relation_dict):
         entity_id = entity_dict['id']
+        entity_dict['name'] = entity_dict['name'].strip().replace(" ", "_")
         entity_name = entity_dict['name']
+        new_key_id_list = []
 
         if entity_id in combinable_recursive_relation_dict:
+            key_id_list = list(entity_dict['key'][0])
+            attr_list = list(entity_dict['attribute'])
+            name_type_list = []
 
-            relationship_name = combinable_recursive_relation_dict[entity_id]['name']
-            relationship_attr_dict_list = combinable_recursive_relation_dict[entity_id]['attribute']
+            for id in key_id_list:
+                for dict in attr_list:
+                    if 'id' in dict and dict['id'] == id:
+                        lst = []
+                        name = dict['name']
+                        type_ = dict['type']
+                        lst.append(name)
+                        lst.append(type_)
+                        name_type_list.append(lst)
 
-            primary_key_attr_id = entity_dict['key'][0][0]
-            attr_dict_list = entity_dict['attribute']
-            primary_key_attr_dict = attr_dict_list[int(primary_key_attr_id)-1]
-            primary_key_name = primary_key_attr_dict['name']
-            primary_key_type = primary_key_attr_dict['type']
+            if isinstance(combinable_recursive_relation_dict[entity_id], list):
+                first = combinable_recursive_relation_dict[entity_id][0]
 
-            next_id = len(attr_dict_list)
-            attr_dict_list.append({'id':str(next_id), 'name': relationship_name + "_" + primary_key_name, 'type':primary_key_type,
-                                   'reference': 'REFERENCES '+ entity_name + "_" +relationship_name + ' (' + primary_key_name + ')'})
-            next_id = next_id + 1
+                relationship_name = first['name'].strip().replace(" ", "_")
+                relationship_attr_dict_list = first['attribute']
+                primary_key_attr_id_list = entity_dict['key'][0]
+                attr_dict_list = entity_dict['attribute']
 
-            for relationship_attr_dict in relationship_attr_dict_list:
-                attr_dict_list.append({'id':str(next_id), 'name':relationship_attr_dict['name'], 'type':relationship_attr_dict['type']})
+                next_id = 1
+                for lst in name_type_list:
+                    primary_key_name=lst[0]
+                    primary_key_type=lst[1]
+                    primary_key_type=lst[1]
 
-            entity_dict['attribute'] = attr_dict_list
-            entity_dict['name'] = entity_name + '_' + relationship_name
+                    dict = {}
+                    dict['id'] = "new" + str(next_id)
+                    dict['name'] = relationship_name + "_" + primary_key_name
+                    dict['type'] = primary_key_type
+                    dict['reference'] = 'REFERENCES ' + entity_name + "_" + relationship_name + ' (' + primary_key_name + ')'
+
+                    new_key_id_list.append("new" + str(next_id))
+                    attr_dict_list.append(dict)
+                    next_id = next_id + 1
+
+                if 'include' in first:
+                    if first['include'] == 'true':
+                        for id in new_key_id_list:
+                            primary_key_attr_id_list.append(id)
+
+                for relationship_attr_dict in relationship_attr_dict_list:
+                    dict = {}
+                    dict['id'] = "new" + str(next_id)
+                    dict['name'] = relationship_attr_dict['name']
+                    dict['type'] = relationship_attr_dict['type']
+
+                    if 'not_null' in relationship_attr_dict:
+                        dict['not_null'] = 'true'
+                    if 'unique' in relationship_attr_dict:
+                        dict['unique'] = 'true'
+
+                    attr_dict_list.append(dict)
+                    next_id = next_id + 1
+
+                entity_dict['attribute'] = attr_dict_list
+                entity_dict['name'] = entity_name + '_' + relationship_name
+
+                for i in range(1, len(combinable_recursive_relation_dict[entity_id])):
+                    new_entity_dict = {}
+                    new_entity_attr_dict_list = list(attr_list)
+                    key_list = list(key_id_list)
+
+                    recursive_dict = combinable_recursive_relation_dict[entity_id][i]
+                    relationship_name = recursive_dict['name'].strip().replace(" ", "_")
+                    new_name = entity_name + "_" + relationship_name
+                    new_entity_dict['name'] = new_name
+                    new_entity_dict['id'] = relationship_name
+
+                    count = 1
+                    for lst in name_type_list:
+                        dict = {}
+                        dict['name'] = lst[0]
+                        dict['type'] = lst[1]
+                        dict['id'] = str(count)
+                        count = count + 1
+                        new_entity_attr_dict_list.append(dict)
+
+                        dict = {}
+                        dict['name'] = relationship_name + "_" + lst[0]
+                        dict['type'] = lst[1]
+                        dict['reference'] = "REFERENCES " + new_name + "(" + lst[0].strip().replace(" ", "_") + ")"
+                        dict['id'] = str(count)
+                        new_entity_attr_dict_list.append(dict)
+                        if 'include' in recursive_dict:
+                            if recursive_dict['include'] == 'true':
+                                key_list.append(str(count))
+                        count = count + 1
+
+                    relationship_attr_dict_list = recursive_dict['attribute']
+                    for dict in relationship_attr_dict_list:
+                        dict['id'] = dict['name']
+                        new_entity_attr_dict_list.append(dict)
+
+                    new_entity_dict['attribute'] = new_entity_attr_dict_list
+                    dummy_list=[]
+                    dummy_list.append(key_list)
+                    new_entity_dict['key']=dummy_list
+                    entities_list.append(new_entity_dict)
+
+            else:
+                relationship_name = combinable_recursive_relation_dict[entity_id]['name'].strip().replace(" ", "_")
+                relationship_attr_dict_list = combinable_recursive_relation_dict[entity_id]['attribute']
+                primary_key_attr_id_list = entity_dict['key'][0]
+                attr_dict_list = entity_dict['attribute']
+
+                next_id = 1
+                for id in primary_key_attr_id_list:
+                    for dict in attr_dict_list:
+                        if 'id' in dict and dict['id'] == id:
+                            primary_key_attr_dict = dict
+                            primary_key_name = primary_key_attr_dict['name']
+                            primary_key_type = primary_key_attr_dict['type']
+
+                            dict = {}
+                            dict['id'] = "new" + str(next_id)
+                            dict['name'] = relationship_name + "_" + primary_key_name
+                            dict['type'] = primary_key_type
+                            dict['reference'] = 'REFERENCES ' + entity_name + "_" + relationship_name + ' (' + primary_key_name + ')'
+
+                            new_key_id_list.append("new" + str(next_id))
+                            attr_dict_list.append(dict)
+                            next_id = next_id + 1
+                            break
+
+                if 'include' in combinable_recursive_relation_dict[entity_id]:
+                    if combinable_recursive_relation_dict[entity_id]['include'] == 'true':
+                        for id in new_key_id_list:
+                            primary_key_attr_id_list.append(id)
+
+                for relationship_attr_dict in relationship_attr_dict_list:
+                    dict = {}
+                    dict['id'] = "new" + str(next_id)
+                    dict['name'] = relationship_attr_dict['name']
+                    dict['type'] = relationship_attr_dict['type']
+
+                    if 'not_null' in relationship_attr_dict:
+                        dict['not_null'] = 'true'
+                    if 'unique' in relationship_attr_dict:
+                        dict['unique'] = 'true'
+
+                    attr_dict_list.append(dict)
+                    next_id = next_id + 1
+
+                entity_dict['attribute'] = attr_dict_list
+                entity_dict['name'] = entity_name + '_' + relationship_name
+
 
         elif entity_id in entity_combinable_relation_dict:
 
-            relationship_name = entity_combinable_relation_dict[entity_id]['name']
-            entity_dict['name'] = entity_dict['name'] + "_" + relationship_name
-
+            relationship_name = entity_combinable_relation_dict[entity_id]['name'].strip().replace(" ", "_")
             relationship_attr_dict_list = entity_combinable_relation_dict[entity_id]['attribute']
-            entity_attr_dict_list = entity_dict['attribute']
-            next_id = len(entity_attr_dict_list)
 
             for relationship_attr_dict in relationship_attr_dict_list:
-                entity_attr_dict_list.append({'id':str(next_id), 'name':relationship_attr_dict['name'], 'type': relationship_attr_dict['type']})
-                next_id = next_id + 1
+
+                relationship_attr_name = relationship_attr_dict['name'].strip().replace(" ", "_")
+                relationship_attr_type = relationship_attr_dict['type']
+                string = "ALTER TABLE " + entity_name + "\nADD COLUMN " + relationship_attr_name + " " + relationship_attr_type
+
+                if 'not_null' in relationship_attr_dict:
+                    string += " NOT NULL"
+
+                if 'unique' in relationship_attr_dict:
+                    string += " UNIQUE"
+
+                string += ";\n"
+
+                self.alter_table_list.append(string)
 
             foreign_entity_id = entity_combinable_relation_dict[entity_id]['foreign_entity_id']
-            entity_attr_dict_list.append({'id': next_id, 'foreign_entity_id': foreign_entity_id})
+
+            for dict in entities_list:
+                if dict['id'] == foreign_entity_id:
+                    foreign_entity_dict = dict
+                    break
+
+            foreign_entity_name = foreign_entity_dict['name'].strip().replace(" ", "_")
+            primary_key_attr_name_list, primary_key_attr_type_list = self.find_primary_keys_name_type(
+                foreign_entity_dict, entities_list, relations_list)
+
+            for i in range(0, len(primary_key_attr_name_list)):
+                name = primary_key_attr_name_list[i].strip().replace(" ", "_")
+                type = primary_key_attr_type_list[i]
+
+                self.alter_table_list.append(
+                    "ALTER TABLE " + entity_name + "\nADD COLUMN " + name + " " + type + " REFERENCES " + foreign_entity_name + " (" + name + ");\n")
+
+            self.alter_table_list.append("DROP TABLE " + relationship_name + ";\n")
 
         else:
             pass
 
     def create_table_for_entity(self, entity_dict, entities_list, relations_list):
 
+        entity_dict['name'] = entity_dict['name'].strip().replace(" ", "_")
         table_name = entity_dict['name']
         self.check_for_keyword(table_name)
-        table = self.Database.set_table(table_name.strip().replace(" ", "_"))
         ddl = "CREATE TABLE " + table_name.strip().replace(" ", "_") + " (\n"
+        table = self.Database.set_table(table_name)
 
         entity_id = entity_dict['id']
         self.entity_id_name_dict[entity_id] = table_name.strip()
@@ -358,13 +556,11 @@ class DDLGenerator():
         unique_str = ""
 
         for attribute_dict in attribute_list:
+
             id = attribute_dict['id']
 
             if 'name' in attribute_dict:
                 ddl = self.get_entity_attr_name_type(attr_id_to_name_dict, attribute_dict, ddl, id, table)
-
-            elif 'foreign_entity_id' in attribute_dict:
-                ddl = self.handle_merged_relationship(attribute_dict, entities_list, relations_list, ddl, table)
 
             elif 'relation_id' in attribute_dict:
                 ddl = self.handle_weak_entity_relationship(attr_id_to_name_dict, attribute_dict, ddl, entity_id, id,
@@ -386,11 +582,7 @@ class DDLGenerator():
                 ddl += str
 
         ddl = ddl[:-2]
-        ddl += "\n);"
-
-        # print '\n'
-        # print ddl
-        # print '\n'
+        ddl += "\n);\n"
         return ddl
 
     def get_entity_attr_name_type(self, attr_id_to_name_dict, attribute_dict, ddl, id, table):
@@ -404,38 +596,26 @@ class DDLGenerator():
         attr_name_type_pair.append(attr_name)
         attr_name_type_pair.append(attr_type)
 
+        ddl += "    " + attr_name.strip().replace(" ", "_") + " " + attr_type
+
+        if 'not_null' in attribute_dict and attribute_dict['not_null'].lower() == 'true':
+            ddl += " NOT NULL"
+
+        if 'unique' in attribute_dict and attribute_dict['unique'].lower() == 'true':
+            ddl += " UNIQUE"
+
         if 'reference' in attribute_dict:
-            left = attribute_dict['reference'].index('(')
-            right = attribute_dict['reference'].index(')')
-            attrs = attribute_dict['reference'][left+1:right]
-            attrs = [attr.strip() for attr in attrs.split(',')]
-            ddl += "    " + attr_name.strip().replace(" ", "_") + " " + attr_type + " " + attribute_dict['reference'] + ",\n"
-            table.add_foreign_key([attr_name.strip().replace(" ", "_")], table.table_name, attrs)
-        else:
-            ddl += "    " + attr_name.strip().replace(" ", "_") + " " + attr_type + ",\n"
-        table.add_attribute(attr_name.strip().replace(" ", "_"), attr_type)
+            ddl += " " + attribute_dict['reference']
 
+            #left = attribute_dict['reference'].index('(')
+            #right = attribute_dict['reference'].index(')')
+            #attrs = attribute_dict['reference'][left+1:right]
+            #attrs = [attr.strip() for attr in attrs.split(',')]
+            #table.add_foreign_key([attr_name.strip().replace(" ", "_")], table.table_name, attrs)
+
+        ddl += ",\n"
         attr_id_to_name_dict[id] = attr_name_type_pair
-        return ddl
-
-    def handle_merged_relationship(self, attribute_dict, entities_list, relations_list, ddl, table):
-
-        foreign_identity_id = attribute_dict['foreign_entity_id']
-
-        for entity_dict in entities_list:
-
-            if entity_dict['id'] == foreign_identity_id:
-                foreign_entity_name = entity_dict['name']
-                primary_key_attr_name_list, primary_key_attr_type_list = self.find_primary_keys_name_type(entity_dict, entities_list, relations_list)
-
-                for i in range(0, len(primary_key_attr_name_list)):
-                    name = primary_key_attr_name_list[i]
-                    type = primary_key_attr_type_list[i]
-
-                    ddl += "    " + name + " " + type + " REFERENCES " + foreign_entity_name + " (" + name + "),\n"
-                    table.add_attribute(name, type)
-
-                break
+        #table.add_attribute(attr_name.strip().replace(" ", "_"), attr_type)
 
         return ddl
 
@@ -446,30 +626,89 @@ class DDLGenerator():
 
         primary_keys_list = entity_dict['key'][0]
         attr_dict_list = entity_dict['attribute']
+
         for attr_id in primary_keys_list:
+
             for attr_dict in attr_dict_list:
                 if attr_dict['id'] == attr_id:
 
                     if 'name' in attr_dict:
                         name_list.append(attr_dict['name'])
                         type_list.append(attr_dict['type'])
-
                     elif 'relation_id' in attr_dict:
+
                         for relation_dict in relations_list:
+
                             if relation_dict['id'] in self.weak_entity_relationship_id_list:
                                 relation_attr_dict_list = relation_dict['attribute']
-                                if relation_attr_dict_list[2]['relation_id'] == attr_dict['relation_id']:
-                                    if relation_attr_dict_list[0]['entity_id'] == entity_id:
-                                        strong_entity_id = relation_attr_dict_list[1]['entity_id']
-                                    else:
-                                        strong_entity_id =relation_attr_dict_list[0]['entity_id']
 
-                                    strong_name_list, strong_type_list = self.find_primary_keys_name_type(entities_list[strong_entity_id-1], entities_list, relations_list)
-                                    for i in range(0, len(strong_name_list)):
-                                        name_list.append(strong_name_list[i])
-                                        type_list.append(strong_type_list[i])
+                                for dict in relation_attr_dict_list:
 
-                                    break
+                                    if 'relation_id' in dict and dict['relation_id']== attr_dict['relation_id']:
+
+                                        for dict2 in relation_attr_dict_list:
+
+                                            if 'entity_id' in dict:
+                                                if dict2['entity_id'] == entity_id:
+                                                    pass
+                                                else:
+                                                    strong_entity_id = dict['entity_id']
+
+
+                                        strong_name_list, strong_type_list = self.find_entity_keys_with_id(strong_entity_id, entities_list, relations_list)
+                                        for i in range(0, len(strong_name_list)):
+                                            name_list.append(strong_name_list[i])
+                                            type_list.append(strong_type_list[i])
+                                        break
+
+        return name_list, type_list
+
+
+    def find_entity_keys_with_id(self, entity_id, entities_list, relations_list):
+
+        name_list = []
+        type_list = []
+
+        for entity_dict in entities_list:
+            if entity_dict['entity_id'] == entity_id:
+                primary_key_id_list = entity_dict['key'][0]
+                attr_dict_list = entity_dict['attribute']
+
+                for id in primary_key_id_list:
+
+                    for attr_dict in attr_dict_list:
+                        if attr_dict['id'] == id:
+
+                            if 'name' in attr_dict:
+                                name_list.append(attr_dict['name'])
+                                type_list.append(attr_dict['type'])
+                            elif 'relation_id' in attr_dict:
+
+                                for relation_dict in relations_list:
+
+                                    if relation_dict['id'] in self.weak_entity_relationship_id_list:
+                                        relation_attr_dict_list = relation_dict['attribute']
+
+                                        for dict in relation_attr_dict_list:
+
+                                            if 'relation_id' in dict and dict['relation_id'] == attr_dict['relation_id']:
+
+                                                for dict2 in relation_attr_dict_list:
+
+                                                    if 'entity_id' in dict:
+                                                        if dict2['entity_id'] == entity_id:
+                                                            pass
+                                                        else:
+                                                            strong_entity_id = dict['entity_id']
+
+                                                strong_name_list, strong_type_list = self.find_entity_keys_with_id(
+                                                    strong_entity_id, entities_list, relations_list)
+
+                                                for i in range(0, len(strong_name_list)):
+                                                    name_list.append(strong_name_list[i])
+                                                    type_list.append(strong_type_list[i])
+
+                                                break
 
         return name_list, type_list
 
@@ -491,33 +730,39 @@ class DDLGenerator():
                 if attr in attr_id_to_name_dict:
                     if attr_id_to_name_dict[attr][0].isdigit() == False:
                         primary_key_str += attr_id_to_name_dict[attr][0].strip().replace(" ", "_") + ", "
-                        table.add_primary_key(attr_id_to_name_dict[attr][0].strip().replace(" ", "_"))
                         primary_key_name_list.append(attr_id_to_name_dict[attr])
+
+                        #table.add_primary_key(attr_id_to_name_dict[attr][0].strip().replace(" ", "_"))
                     else:
                         attr_name_list, attr_type_list = self.get_strong_entity_keys(attr_id_to_name_dict[attr][0], entities_list)
-                        foreign_key_this_attrs = []
-                        foreign_key_that_attrs = []
+
+                        #foreign_key_this_attrs = []
+                        #foreign_key_that_attrs = []
                         foreign_key_str = "    FOREIGN KEY ("
+
                         for i in range(0, len(attr_name_list)):
                             ddl += "    " + attr_name_list[i].strip().replace(" ", "_") + " " + attr_type_list[
                                 i] + ",\n"
-                            table.add_attribute(attr_name_list[i].strip().replace(" ", "_"), attr_type_list[i])
+                            #table.add_attribute(attr_name_list[i].strip().replace(" ", "_"), attr_type_list[i])
                             foreign_key_str += attr_name_list[i].strip().replace(" ", "_") + ", "
-                            foreign_key_this_attrs.append(attr_name_list[i].strip().replace(" ", "_"))
+                            #foreign_key_this_attrs.append(attr_name_list[i].strip().replace(" ", "_"))
                             key_type_pair.append(attr_name_list[i])
                             key_type_pair.append(attr_type_list[i])
                             primary_key_name_list.append(key_type_pair)
                         foreign_key_str = foreign_key_str[:-2]
                         foreign_key_str += ") REFERENCES " + self.strong_entity_name.strip().replace(" ", "_") + " ("
+
                         for attr_name in attr_name_list:
                             foreign_key_str += attr_name.strip().replace(" ", "_") + ", "
-                            foreign_key_that_attrs.append(attr_name.strip().replace(" ", "_"))
                             primary_key_str += attr_name.strip().replace(" ", "_") + ", "
-                            table.add_primary_key(attr_id_to_name_dict[attr][0].strip().replace(" ", "_"))
+
+                            #foreign_key_that_attrs.append(attr_name.strip().replace(" ", "_"))
+                            #table.add_primary_key(attr_id_to_name_dict[attr][0].strip().replace(" ", "_"))
                         foreign_key_str = foreign_key_str[:-2]
-                        table.add_foreign_key(foreign_key_this_attrs, self.strong_entity_name.strip().replace(" ", "_"), foreign_key_that_attrs)
                         foreign_key_str += "),\n"
                         foreign_key_str_list.append(foreign_key_str)
+
+                        #table.add_foreign_key(foreign_key_this_attrs, self.strong_entity_name.strip().replace(" ", "_"), foreign_key_that_attrs)
 
             primary_key_str = primary_key_str[:-2]
             primary_key_str += "),\n"
@@ -528,8 +773,8 @@ class DDLGenerator():
                 unique_attr_list = key_list[i]
 
                 foreign_key_str = "    FOREIGN KEY ("
-                foreign_key_this_attrs = []
-                foreign_key_that_attrs = []
+                #foreign_key_this_attrs = []
+                #foreign_key_that_attrs = []
                 foreign_key_list = []
 
                 for attr in unique_attr_list:
@@ -550,7 +795,7 @@ class DDLGenerator():
                                 attr_name = attr_name_list[j]
                                 attr_type = attr_type_list[j]
                                 ddl += "    " + attr_name.strip().replace(" ", "_") + " " + attr_type + ",\n"
-                                table.add_attribute(attr_name.strip().replace(" ", "_"), attr_type)
+                                #table.add_attribute(attr_name.strip().replace(" ", "_"), attr_type)
                                 unique_str += attr_name.strip().replace(" ", "_") + ", "
 
                                 foreign_key_list.append(attr_name)
@@ -560,17 +805,18 @@ class DDLGenerator():
 
                 for foreign_key in foreign_key_list:
                     foreign_key_str += foreign_key.strip().replace(" ", "_") + ", "
-                    foreign_key_this_attrs.append(foreign_key.strip().replace(" ", "_"))
+                    #foreign_key_this_attrs.append(foreign_key.strip().replace(" ", "_"))
                 foreign_key_str = foreign_key_str[:-2]
                 foreign_key_str += ") REFERENCES " + self.strong_entity_name.strip().replace(" ", "_") + " ("
 
                 for foreign_key in foreign_key_list:
                     foreign_key_str += foreign_key.strip().replace(" ", "_") + ", "
-                    foreign_key_that_attrs.append(foreign_key.strip().replace(" ", "_"))
+                    #foreign_key_that_attrs.append(foreign_key.strip().replace(" ", "_"))
                 foreign_key_str = foreign_key_str[:-2]
                 foreign_key_str += "),\n"
                 foreign_key_str_list.append(foreign_key_str)
-                table.add_foreign_key(foreign_key_this_attrs, self.strong_entity_name.strip().replace(" ", "_"), foreign_key_that_attrs)
+                #table.add_foreign_key(foreign_key_this_attrs, self.strong_entity_name.strip().replace(" ", "_"), foreign_key_that_attrs)
+
         return ddl, foreign_key_str, foreign_key_str_list, primary_key_str, unique_str
 
     def handle_weak_entity_relationship(self, attr_id_to_name_dict, attribute_dict, ddl, entity_id, id, relations_list, table):
@@ -578,6 +824,7 @@ class DDLGenerator():
         temp_lst = []
         temp_lst.append(relation_id)
         attr_id_to_name_dict[id] = temp_lst
+
         for relation_dict in relations_list:
             relation_attr_dict_list = relation_dict['attribute']
 
@@ -597,8 +844,15 @@ class DDLGenerator():
                             relation_attr_name = relation_attr_dict['name']
                             self.check_for_keyword(relation_attr_name)
                             relation_attr_type = relation_attr_dict['type']
-                            ddl += "    " + relation_attr_name.strip().replace(" ", "_") + " " + relation_attr_type + ",\n"
-                            table.add_attribute(relation_attr_name.strip().replace(" ", "_"), relation_attr_type)
+                            ddl += "    " + relation_attr_name.strip().replace(" ", "_") + " " + relation_attr_type
+                            #table.add_attribute(relation_attr_name.strip().replace(" ", "_"), relation_attr_type)
+
+                            if 'not_null' in relation_attr_dict and relation_attr_dict['not_null'].lower() == 'true':
+                                ddl += " NOT NULL"
+                            if 'unique' in relation_attr_dict and relation_attr_dict['unique'].lower() == 'true':
+                                ddl += ' UNIQUE'
+                            ddl += ",\n"
+
                         j = j + 1
 
                     relation_dict['processed'] = 'True'
@@ -622,7 +876,11 @@ class DDLGenerator():
     def get_strong_entity_keys(self, relation_id, entities_list):
         strong_entity_id = self.weak_entity_relationship_dict[relation_id]
         if strong_entity_id != '-1':
-            strong_entity_dict = entities_list[int(strong_entity_id)-1]
+
+            for entity_dict in entities_list:
+                if entity_dict['id'] == strong_entity_id:
+                    strong_entity_dict = entity_dict
+                    break
 
             if 'id' in strong_entity_dict and strong_entity_dict['id'] == strong_entity_id:
 
@@ -658,6 +916,10 @@ class DDLGenerator():
         relationship_attr_type_pair_list = []
         foreign_key_list = []
 
+        relationship_name = relation_dict['name'].strip().replace(" ", "_")
+        self.check_for_keyword(relationship_name)
+        ddl = 'CREATE TABLE ' + relationship_name + ' (\n'
+
         relation_attr_list = relation_dict['attribute']
 
         for attr_dict in relation_attr_list:
@@ -672,14 +934,14 @@ class DDLGenerator():
                     pair.append(attr_dict['type'])
                     relationship_attr_type_pair_list.append(pair)
 
-        relationship_name = relation_dict['name']
-        self.check_for_keyword(relationship_name)
+                    ddl += "    " + attr_dict['name'].strip().replace(" ", "_") + " " + attr_dict['type']
+                    if 'not_null' in attr_dict and attr_dict['not_null'].lower() == 'true':
+                        ddl += " NOT NULL"
+                    if 'unique' in attr_dict and attr_dict['unique'].lower() == 'true':
+                        ddl += " UNIQUE"
+                    ddl += ",\n"
 
-        table = self.Database.set_table(relationship_name.strip().replace(" ", "_"))
-        ddl = 'CREATE TABLE ' + relationship_name.strip().replace(" ", "_") + ' (\n'
-        for pair in relationship_attr_type_pair_list:
-            ddl += "    " + pair[0].strip().replace(" ", "_") + " " + pair[1] + ",\n"
-            table.add_attribute(pair[0].strip().replace(" ", "_"), pair[1])
+        table = self.Database.set_table(relationship_name)
 
         primary_key_str = "    PRIMARY KEY ("
         for id in entities_id_list:
@@ -693,19 +955,19 @@ class DDLGenerator():
                     for pair in primary_key_list:
                         ddl += "    " + pair[0].strip().replace(" ", "_") + " " + pair[1] + ",\n"
                         primary_key_str += pair[0].strip().replace(" ", "_") + ", "
-                        table.add_primary_key(pair[0].strip().replace(" ", "_"))
+                        #table.add_primary_key(pair[0].strip().replace(" ", "_"))
                         foreign_key_str += pair[0].strip().replace(" ", "_") + ", "
-                        foreign_key_this_attrs.append(pair[0].strip().replace(" ", "_"))
+                        #foreign_key_this_attrs.append(pair[0].strip().replace(" ", "_"))
 
                     foreign_key_str = foreign_key_str[:-2]
                     foreign_key_str += ") REFERENCES " + entity_name + " ("
                     for pair in primary_key_list:
                         foreign_key_str += pair[0].strip().replace(" ", "_") + ", "
-                        foreign_key_that_attrs.append(pair[0].strip().replace(" ", "_"))
+                        #foreign_key_that_attrs.append(pair[0].strip().replace(" ", "_"))
                     foreign_key_str = foreign_key_str[:-2]
                     foreign_key_str += "),\n"
                     foreign_key_list.append(foreign_key_str)
-                    table.add_foreign_key(foreign_key_this_attrs, entity_name, foreign_key_that_attrs)
+                    #table.add_foreign_key(foreign_key_this_attrs, entity_name, foreign_key_that_attrs)
 
         primary_key_str = primary_key_str[:-2]
         primary_key_str += "),\n"
@@ -715,8 +977,7 @@ class DDLGenerator():
             ddl += str
 
         ddl = ddl[:-2]
-        ddl += "\n);"
-        # print ddl
+        ddl += "\n);\n"
         return ddl
 
     def check_for_keyword(self, str):
@@ -764,6 +1025,7 @@ class DDLGenerator():
     def __init__(self):
 
         self.ddl_list = []
+        self.alter_table_list=[]
         self.weak_entity_relationship_id_list = []
         self. weak_entity_relationship_dict = {}
         self.strong_entity_id = '-1'

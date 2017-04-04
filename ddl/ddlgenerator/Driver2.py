@@ -1,6 +1,7 @@
-from ddlgenerator.DDLGenerator import DDLGenerator
-
 '''first test case given by weilong'''
+
+from ddl.ddlgenerator.DDLGenerator import DDLGenerator
+
 class Driver2():
 
     def __init__(self):

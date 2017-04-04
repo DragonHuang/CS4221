@@ -1,6 +1,6 @@
 ''' many-one relationship, merge relationship with the MANY entity'''
 
-from ddlgenerator.DDLGenerator import DDLGenerator
+from ddl.ddlgenerator.DDLGenerator import DDLGenerator
 
 class Driver6():
 

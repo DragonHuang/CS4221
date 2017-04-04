@@ -1,6 +1,7 @@
-from ddlgenerator.DDLGenerator import DDLGenerator
-
 '''test 1 er diagram'''
+
+from ddl.ddlgenerator.DDLGenerator import DDLGenerator
+
 class Driver3():
 
     def __init__(self):

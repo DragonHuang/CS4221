@@ -2,7 +2,7 @@
 
 from ddl.ddlgenerator.DDLGenerator import DDLGenerator
 
-class Driver7():
+class Driver8():
 
     def __init__(self):
         dict={}
@@ -10,12 +10,11 @@ class Driver7():
 
         entity_one_dict = {}
         entity_one_attr_list = []
-        entity_one_attr_list.append({'id':'1', 'name':'ID', 'type': 'datetime'})
-        entity_one_attr_list.append({'id':'2', 'name':'Name'})
-        entity_one_attr_list.append({'id':'3', 'name':'DOB', 'type':'date'})
+        entity_one_attr_list.append({'id':'1', 'name':'name'})
+        entity_one_attr_list.append({'id':'2', 'name':'type'})
         entity_one_dict['attribute'] = entity_one_attr_list
         entity_one_dict['id']='1'
-        entity_one_dict['name']='Person'
+        entity_one_dict['name']='A'
         entity_one_key_list = []
         entity_one_key_list.append(['1','2'])
         entity_one_dict['key']=entity_one_key_list
@@ -23,18 +22,24 @@ class Driver7():
         entity_list.append(entity_one_dict)
         dict['entity']=entity_list
 
-        relation_attr_list = []
-        relation_attr_list.append({'max_participation':'N', 'entity_id':'1', 'min_participation':'1'})
+        relation_list = []
 
-        relation_list=[]
+        relation_one_attr_list = []
+        relation_one_attr_list.append({'max_participation':'1', 'entity_id':'1', 'min_participation':'1'})
         relation_one_dict = {}
-
-        relation_one_dict['attribute']=relation_attr_list
+        relation_one_dict['attribute']=relation_one_attr_list
         relation_one_dict['id']='1'
-        relation_one_dict['name'] = 'MarriedTo'
+        relation_one_dict['name'] = 'AA'
+
+        relation_two_dict = {}
+        relation_two_attr_list = []
+        relation_two_attr_list.append({'max_participation': 'N', 'entity_id': '1', 'min_participation': 'N'})
+        relation_two_dict['attribute'] = relation_two_attr_list
+        relation_two_dict['id'] = '2'
+        relation_two_dict['name'] = 'BB'
 
         relation_list.append(relation_one_dict)
-
+        relation_list.append(relation_two_dict)
         dict['relation'] = relation_list
 
         ddlObject = DDLGenerator()
@@ -42,4 +47,4 @@ class Driver7():
         list = ddlObject.generate_ddl(new_dict, "psql")
 
 if __name__ == "__main__":
-        Driver7()
+        Driver8()

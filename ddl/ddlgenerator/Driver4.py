@@ -1,6 +1,6 @@
 ''' one ternary relationship with three strong entities '''
 
-from ddlgenerator.DDLGenerator import DDLGenerator
+from ddl.ddlgenerator.DDLGenerator import DDLGenerator
 
 class Driver4():
 

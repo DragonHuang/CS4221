@@ -1,6 +1,6 @@
 '''1-1 with total participation, merge relationship with the total participation entity'''
 
-from ddlgenerator.DDLGenerator import DDLGenerator
+from ddl.ddlgenerator.DDLGenerator import DDLGenerator
 
 class Driver5():
 

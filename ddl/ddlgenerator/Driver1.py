@@ -1,6 +1,5 @@
 ''' simple ER diagram, two strong entities with one relationship'''
-
-from ddlgenerator.DDLGenerator import DDLGenerator
+from ddl.ddlgenerator.DDLGenerator import DDLGenerator
 
 class Driver1():
 
