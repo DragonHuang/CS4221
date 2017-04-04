@@ -11,7 +11,7 @@ class Driver6():
         entity_one_dict = {}
         entity_one_attr_list = []
         entity_one_attr_list.append({'id':'1', 'name':'Staff No'})
-        entity_one_attr_list.append({'id':'2', 'name':'Name'})
+        entity_one_attr_list.append({'id':'2', 'name':'Name', 'not_null':'true','unique':'true'})
         entity_one_attr_list.append({'id':'3', 'name':'DOB', 'type':'date'})
         entity_one_dict['attribute'] = entity_one_attr_list
         entity_one_dict['id']='1'
@@ -23,7 +23,7 @@ class Driver6():
         entity_two_dict = {}
         entity_two_attr_list = []
         entity_two_attr_list.append({'id':'1', 'name':'Property No'})
-        entity_two_attr_list.append({'id':'2', 'name':'Address'})
+        entity_two_attr_list.append({'id':'2', 'name':'Address', 'not_null':'true'})
         entity_two_dict['attribute']=entity_two_attr_list
         entity_two_dict['id']='2'
         entity_two_dict['name']='Property for Rent'
@@ -52,7 +52,6 @@ class Driver6():
 
         ddlObject = DDLGenerator()
         new_dict = ddlObject.fill_missing_type(dict, True, 'psql')
-        print new_dict
         ddlObject.generate_ddl(new_dict, "psql")
 
 if __name__ == "__main__":
