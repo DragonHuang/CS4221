@@ -40,7 +40,7 @@ def finish(request):
             })
 
 
-def todo(request):
+def error(request):
     return HttpResponse("todo")
 
 def confirm(request):
@@ -55,16 +55,20 @@ def confirm(request):
     if request.method == 'POST':
         form = ConfirmForm(request.POST)
         data = request.POST.get("Tables")
-        modify = json.loads(data)
-        print ER
-        print modify
-        for entity in modify:
-            for ent in ER['entity']:
-                if ent['name'] == entity:
-                    for attr in ent['attribute']:
-                        if int(attr['id']) < len(modify[entity]):
-                            if modify[entity][int(attr['id'])] != None:
-                                attr['type'] = str(modify[entity][int(attr['id'])])
+        try:
+            modify = json.loads(data)
+            print ER
+            print modify
+            for entity in modify:
+                for ent in ER['entity']:
+                    if ent['name'] == entity:
+                        for attr in ent['attribute']:
+                            if int(attr['id']) < len(modify[entity]):
+                                if modify[entity][int(attr['id'])] != None:
+                                    attr['type'] = str(modify[entity][int(attr['id'])])
+        except ValueError as e:
+            print "not JSON value, pass"
+        
 
         print "\n\n\n"
         print ER
@@ -87,7 +91,16 @@ def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            ER = parseXML(request.FILES['File'])
+            try:
+                ER = parseXML(request.FILES['File'])
+            except Exception as e:
+                print e
+                print str(e)
+                return render(request, 'ddl/error.html',
+                    {
+                        'TYPE': "XML FORMAT Error",
+                        'ERROR': str(e)
+                    })
             
             check_values = request.POST.getlist('Options')
             Database = request.POST.get('Database')
@@ -99,7 +112,16 @@ def upload_file(request):
                 smart = False
             
             if u'2' in check_values:
-                ER = ddlObject.fill_missing_type(ER, smart, Database)
+                try:
+                    ER = ddlObject.fill_missing_type(ER, smart, Database)
+                except Exception as e:
+                    print e
+                    print str(e)
+                    return render(request, 'ddl/error.html',
+                        {
+                            'TYPE': "XML Content Error",
+                            'ERROR': str(e)
+                        })
 
                 with open('IO/ER', 'wb') as output:
                     pickle.dump(ER, output, pickle.HIGHEST_PROTOCOL)
@@ -109,8 +131,16 @@ def upload_file(request):
                 output.close()
                 return HttpResponseRedirect('/ddl/confirm')
             else:
-                ER = ddlObject.fill_missing_type(ER, smart, Database)
-                DDL = ddlObject.generate_ddl(ER, Database)
+                try:
+                    ER = ddlObject.fill_missing_type(ER, smart, Database)
+                    DDL = ddlObject.generate_ddl(ER, Database)
+                except Exception as e:
+                    return render(request, 'ddl/error.html',
+                        {
+                            'TYPE': "XML Content Error",
+                            'ERROR': str(e)
+                        })
+                
                 fdset = ddlObject.Database.drived_fdset()
 
                 bcnf_check = []
