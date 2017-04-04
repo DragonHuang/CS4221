@@ -62,7 +62,6 @@ class Driver2():
 
         ddlObject = DDLGenerator()
         new_dict = ddlObject.fill_missing_type(dict, True, 'psql')
-        print new_dict
         ddlObject.generate_ddl(new_dict, "psql")
 
 if __name__ == "__main__":

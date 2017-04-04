@@ -24,7 +24,7 @@ class Driver7():
         dict['entity']=entity_list
 
         relation_attr_list = []
-        relation_attr_list.append({'max_participation':'1', 'entity_id':'1', 'min_participation':'N'})
+        relation_attr_list.append({'max_participation':'N', 'entity_id':'1', 'min_participation':'N'})
 
         relation_list=[]
         relation_one_dict = {}
@@ -39,7 +39,6 @@ class Driver7():
 
         ddlObject = DDLGenerator()
         new_dict = ddlObject.fill_missing_type(dict, True, 'psql')
-        print new_dict
         ddlObject.generate_ddl(new_dict, "psql")
 
 if __name__ == "__main__":

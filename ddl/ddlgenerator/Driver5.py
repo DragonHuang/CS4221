@@ -50,9 +50,9 @@ class Driver5():
 
         dict['relation'] = relation_list
 
+
         ddlObject = DDLGenerator()
         new_dict = ddlObject.fill_missing_type(dict, True, 'psql')
-        print new_dict
         ddlObject.generate_ddl(new_dict, "psql")
 
 if __name__ == "__main__":
