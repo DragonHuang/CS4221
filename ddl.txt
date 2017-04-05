@@ -183,3 +183,162 @@ CREATE TABLE AD (
      FOREIGN KEY (name, type) REFERENCES A_AA (name, type),
      FOREIGN KEY (D_name, D_type) REFERENCES D (name, type)
 );
+
+template 6:
+CREATE TABLE A (
+     name varchar(32),
+     type varchar(32),
+     name11 varchar(32),
+     type22 varchar(32),
+     name33 varchar(32),
+     type44 varchar(32),
+     name55 varchar(32),
+     type66 varchar(32),
+     PRIMARY KEY (name, type, name11, type22, name33, type44, name55, type66)
+);
+
+template 7:
+CREATE TABLE A (
+     name varchar(32),
+     type varchar(32),
+     name11 varchar(32),
+     type22 varchar(32),
+     name33 varchar(32),
+     type44 varchar(32),
+     name55 varchar(32),
+     type66 varchar(32),
+     AA_name varchar(32),
+     AA_type varchar(32),
+     AA_name11 varchar(32),
+     AA_type22 varchar(32),
+     AA_name33 varchar(32),
+     AA_type44 varchar(32),
+     AA_name55 varchar(32),
+     AA_type66 varchar(32),
+     C varchar(32),
+     PRIMARY KEY (name, type, name11, type22, name33, type44, name55, type66)
+     FOREIGN KEY (AA_name, AA_type, AA_name11, AA_type22, AA_name33, AA_type44, AA_name55, AA_type66) REFERENCES A (name, type, name11, type22, name33, type44, name55, type66)
+);
+
+template 8:
+CREATE TABLE A (
+     name varchar(32),
+     type varchar(32),
+     AA_name varchar(32) REFERENCES A (name),
+     C varchar(32),
+     PRIMARY KEY (name)
+);
+
+template 9:
+CREATE TABLE A (
+     name varchar(32),
+     type varchar(32),
+     name11 varchar(32),
+     type22 varchar(32),
+     name33 varchar(32),
+     type44 varchar(32),
+     name55 varchar(32),
+     type66 varchar(32),
+     PRIMARY KEY (name, type, name11, type22, name33, type44, name55, type66)
+);
+
+CREATE TABLE B (
+     B_name varchar(32),
+     B_type varchar(32),
+     B_name11 varchar(32),
+     B_type22 varchar(32),
+     B_name33 varchar(32),
+     B_type44 varchar(32),
+     B_name55 varchar(32),
+     B_type66 varchar(32),
+     PRIMARY KEY (B_name, B_type, B_name11, B_type22, B_name33, B_type44, B_name55, B_type66)
+);
+
+CREATE TABLE C (
+     C_name varchar(32),
+     C_type varchar(32),
+     C_name11 varchar(32),
+     C_type22 varchar(32),
+     C_name33 varchar(32),
+     C_type44 varchar(32),
+     C_name55 varchar(32),
+     C_type66 varchar(32),
+     PRIMARY KEY (C_name, C_type, C_name11, C_type22, C_name33, C_type44, C_name55, C_type66)
+);
+
+CREATE TABLE AB (
+     T varchar(32),
+     name varchar(32),
+     type varchar(32),
+     name11 varchar(32),
+     type22 varchar(32),
+     name33 varchar(32),
+     type44 varchar(32),
+     name55 varchar(32),
+     type66 varchar(32),
+     B_name varchar(32),
+     B_type varchar(32),
+     B_name11 varchar(32),
+     B_type22 varchar(32),
+     B_name33 varchar(32),
+     B_type44 varchar(32),
+     B_name55 varchar(32),
+     B_type66 varchar(32),
+     PRIMARY KEY (name, type, name11, type22, name33, type44, name55, type66, B_name, B_type, B_name11, B_type22, B_name33, B_type44, B_name55, B_type66),
+     FOREIGN KEY (name, type, name11, type22, name33, type44, name55, type66) REFERENCES A (name, type, name11, type22, name33, type44, name55, type66),
+     FOREIGN KEY (B_name, B_type, B_name11, B_type22, B_name33, B_type44, B_name55, B_type66) REFERENCES B (B_name, B_type, B_name11, B_type22, B_name33, B_type44, B_name55, B_type66)
+);
+
+CREATE TABLE AC (
+     AC_T varchar(32),
+     name varchar(32),
+     type varchar(32),
+     name11 varchar(32),
+     type22 varchar(32),
+     name33 varchar(32),
+     type44 varchar(32),
+     name55 varchar(32),
+     type66 varchar(32),
+     C_name varchar(32),
+     C_type varchar(32),
+     C_name11 varchar(32),
+     C_type22 varchar(32),
+     C_name33 varchar(32),
+     C_type44 varchar(32),
+     C_name55 varchar(32),
+     C_type66 varchar(32),
+     PRIMARY KEY (name, type, name11, type22, name33, type44, name55, type66, C_name, C_type, C_name11, C_type22, C_name33, C_type44, C_name55, C_type66),
+     FOREIGN KEY (name, type, name11, type22, name33, type44, name55, type66) REFERENCES A (name, type, name11, type22, name33, type44, name55, type66),
+     FOREIGN KEY (C_name, C_type, C_name11, C_type22, C_name33, C_type44, C_name55, C_type66) REFERENCES C (C_name, C_type, C_name11, C_type22, C_name33, C_type44, C_name55, C_type66)
+);
+
+CREATE TABLE BC (
+     BC_T varchar(32),
+     B_name varchar(32),
+     B_type varchar(32),
+     B_name11 varchar(32),
+     B_type22 varchar(32),
+     B_name33 varchar(32),
+     B_type44 varchar(32),
+     B_name55 varchar(32),
+     B_type66 varchar(32),
+     C_name varchar(32),
+     C_type varchar(32),
+     C_name11 varchar(32),
+     C_type22 varchar(32),
+     C_name33 varchar(32),
+     C_type44 varchar(32),
+     C_name55 varchar(32),
+     C_type66 varchar(32),
+     PRIMARY KEY (B_name, B_type, B_name11, B_type22, B_name33, B_type44, B_name55, B_type66, C_name, C_type, C_name11, C_type22, C_name33, C_type44, C_name55, C_type66),
+     FOREIGN KEY (B_name, B_type, B_name11, B_type22, B_name33, B_type44, B_name55, B_type66) REFERENCES B (B_name, B_type, B_name11, B_type22, B_name33, B_type44, B_name55, B_type66),
+     FOREIGN KEY (C_name, C_type, C_name11, C_type22, C_name33, C_type44, C_name55, C_type66) REFERENCES C (C_name, C_type, C_name11, C_type22, C_name33, C_type44, C_name55, C_type66)
+);
+
+ALTER TABLE A
+ADD COLUMN T varchar(32);
+
+ALTER TABLE A
+ADD COLUMN FOREIGN KEY (B_name, B_type, B_name11, B_type22, B_name33, B_type44, B_name55, B_type66) REFERENCES B (name, type, name11, type22, name33, type44, name55, type66);
+
+DROP TABLE AB;
