@@ -44,7 +44,7 @@ class Table:
         that_attrs = set([that_table_name + "." + name for name in that_attrs])
         if that_table_name != self.table_name:
             for name in this_attrs:
-                self.attributes.remove(name)
+                self.attributes.add(name)
             for name in that_attrs:
                 self.attributes.add(name)
         else:

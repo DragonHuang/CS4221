@@ -607,15 +607,15 @@ class DDLGenerator():
         if 'reference' in attribute_dict:
             ddl += " " + attribute_dict['reference']
 
-            #left = attribute_dict['reference'].index('(')
-            #right = attribute_dict['reference'].index(')')
-            #attrs = attribute_dict['reference'][left+1:right]
-            #attrs = [attr.strip() for attr in attrs.split(',')]
-            #table.add_foreign_key([attr_name.strip().replace(" ", "_")], table.table_name, attrs)
+            left = attribute_dict['reference'].index('(')
+            right = attribute_dict['reference'].index(')')
+            attrs = attribute_dict['reference'][left+1:right]
+            attrs = [attr.strip() for attr in attrs.split(',')]
+            table.add_foreign_key([attr_name.strip().replace(" ", "_")], table.table_name, attrs)
 
         ddl += ",\n"
         attr_id_to_name_dict[id] = attr_name_type_pair
-        #table.add_attribute(attr_name.strip().replace(" ", "_"), attr_type)
+        table.add_attribute(attr_name.strip().replace(" ", "_"), attr_type)
 
         return ddl
 
@@ -732,20 +732,20 @@ class DDLGenerator():
                         primary_key_str += attr_id_to_name_dict[attr][0].strip().replace(" ", "_") + ", "
                         primary_key_name_list.append(attr_id_to_name_dict[attr])
 
-                        #table.add_primary_key(attr_id_to_name_dict[attr][0].strip().replace(" ", "_"))
+                        table.add_primary_key(attr_id_to_name_dict[attr][0].strip().replace(" ", "_"))
                     else:
                         attr_name_list, attr_type_list = self.get_strong_entity_keys(attr_id_to_name_dict[attr][0], entities_list)
 
-                        #foreign_key_this_attrs = []
-                        #foreign_key_that_attrs = []
+                        foreign_key_this_attrs = []
+                        foreign_key_that_attrs = []
                         foreign_key_str = "    FOREIGN KEY ("
 
                         for i in range(0, len(attr_name_list)):
                             ddl += "    " + attr_name_list[i].strip().replace(" ", "_") + " " + attr_type_list[
                                 i] + ",\n"
-                            #table.add_attribute(attr_name_list[i].strip().replace(" ", "_"), attr_type_list[i])
+                            table.add_attribute(attr_name_list[i].strip().replace(" ", "_"), attr_type_list[i])
                             foreign_key_str += attr_name_list[i].strip().replace(" ", "_") + ", "
-                            #foreign_key_this_attrs.append(attr_name_list[i].strip().replace(" ", "_"))
+                            foreign_key_this_attrs.append(attr_name_list[i].strip().replace(" ", "_"))
                             key_type_pair.append(attr_name_list[i])
                             key_type_pair.append(attr_type_list[i])
                             primary_key_name_list.append(key_type_pair)
@@ -756,13 +756,13 @@ class DDLGenerator():
                             foreign_key_str += attr_name.strip().replace(" ", "_") + ", "
                             primary_key_str += attr_name.strip().replace(" ", "_") + ", "
 
-                            #foreign_key_that_attrs.append(attr_name.strip().replace(" ", "_"))
-                            #table.add_primary_key(attr_id_to_name_dict[attr][0].strip().replace(" ", "_"))
+                            foreign_key_that_attrs.append(attr_name.strip().replace(" ", "_"))
+                            table.add_primary_key(attr_id_to_name_dict[attr][0].strip().replace(" ", "_"))
                         foreign_key_str = foreign_key_str[:-2]
                         foreign_key_str += "),\n"
                         foreign_key_str_list.append(foreign_key_str)
 
-                        #table.add_foreign_key(foreign_key_this_attrs, self.strong_entity_name.strip().replace(" ", "_"), foreign_key_that_attrs)
+                        table.add_foreign_key(foreign_key_this_attrs, self.strong_entity_name.strip().replace(" ", "_"), foreign_key_that_attrs)
 
             primary_key_str = primary_key_str[:-2]
             primary_key_str += "),\n"
@@ -773,8 +773,8 @@ class DDLGenerator():
                 unique_attr_list = key_list[i]
 
                 foreign_key_str = "    FOREIGN KEY ("
-                #foreign_key_this_attrs = []
-                #foreign_key_that_attrs = []
+                foreign_key_this_attrs = []
+                foreign_key_that_attrs = []
                 foreign_key_list = []
 
                 for attr in unique_attr_list:
@@ -795,7 +795,7 @@ class DDLGenerator():
                                 attr_name = attr_name_list[j]
                                 attr_type = attr_type_list[j]
                                 ddl += "    " + attr_name.strip().replace(" ", "_") + " " + attr_type + ",\n"
-                                #table.add_attribute(attr_name.strip().replace(" ", "_"), attr_type)
+                                table.add_attribute(attr_name.strip().replace(" ", "_"), attr_type)
                                 unique_str += attr_name.strip().replace(" ", "_") + ", "
 
                                 foreign_key_list.append(attr_name)
@@ -805,17 +805,17 @@ class DDLGenerator():
 
                 for foreign_key in foreign_key_list:
                     foreign_key_str += foreign_key.strip().replace(" ", "_") + ", "
-                    #foreign_key_this_attrs.append(foreign_key.strip().replace(" ", "_"))
+                    foreign_key_this_attrs.append(foreign_key.strip().replace(" ", "_"))
                 foreign_key_str = foreign_key_str[:-2]
                 foreign_key_str += ") REFERENCES " + self.strong_entity_name.strip().replace(" ", "_") + " ("
 
                 for foreign_key in foreign_key_list:
                     foreign_key_str += foreign_key.strip().replace(" ", "_") + ", "
-                    #foreign_key_that_attrs.append(foreign_key.strip().replace(" ", "_"))
+                    foreign_key_that_attrs.append(foreign_key.strip().replace(" ", "_"))
                 foreign_key_str = foreign_key_str[:-2]
                 foreign_key_str += "),\n"
                 foreign_key_str_list.append(foreign_key_str)
-                #table.add_foreign_key(foreign_key_this_attrs, self.strong_entity_name.strip().replace(" ", "_"), foreign_key_that_attrs)
+                table.add_foreign_key(foreign_key_this_attrs, self.strong_entity_name.strip().replace(" ", "_"), foreign_key_that_attrs)
 
         return ddl, foreign_key_str, foreign_key_str_list, primary_key_str, unique_str
 
@@ -845,7 +845,7 @@ class DDLGenerator():
                             self.check_for_keyword(relation_attr_name)
                             relation_attr_type = relation_attr_dict['type']
                             ddl += "    " + relation_attr_name.strip().replace(" ", "_") + " " + relation_attr_type
-                            #table.add_attribute(relation_attr_name.strip().replace(" ", "_"), relation_attr_type)
+                            table.add_attribute(relation_attr_name.strip().replace(" ", "_"), relation_attr_type)
 
                             if 'not_null' in relation_attr_dict and relation_attr_dict['not_null'].lower() == 'true':
                                 ddl += " NOT NULL"
@@ -955,19 +955,20 @@ class DDLGenerator():
                     for pair in primary_key_list:
                         ddl += "    " + pair[0].strip().replace(" ", "_") + " " + pair[1] + ",\n"
                         primary_key_str += pair[0].strip().replace(" ", "_") + ", "
-                        #table.add_primary_key(pair[0].strip().replace(" ", "_"))
+                        table.add_primary_key(pair[0].strip().replace(" ", "_"))
                         foreign_key_str += pair[0].strip().replace(" ", "_") + ", "
-                        #foreign_key_this_attrs.append(pair[0].strip().replace(" ", "_"))
+                        foreign_key_this_attrs.append(pair[0].strip().replace(" ", "_"))
 
                     foreign_key_str = foreign_key_str[:-2]
                     foreign_key_str += ") REFERENCES " + entity_name + " ("
                     for pair in primary_key_list:
                         foreign_key_str += pair[0].strip().replace(" ", "_") + ", "
-                        #foreign_key_that_attrs.append(pair[0].strip().replace(" ", "_"))
+                        foreign_key_that_attrs.append(pair[0].strip().replace(" ", "_"))
                     foreign_key_str = foreign_key_str[:-2]
                     foreign_key_str += "),\n"
                     foreign_key_list.append(foreign_key_str)
-                    #table.add_foreign_key(foreign_key_this_attrs, entity_name, foreign_key_that_attrs)
+                    print table.table_name, foreign_key_this_attrs, entity_name, foreign_key_that_attrs
+                    table.add_foreign_key(foreign_key_this_attrs, entity_name, foreign_key_that_attrs)
 
         primary_key_str = primary_key_str[:-2]
         primary_key_str += "),\n"

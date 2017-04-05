@@ -69,13 +69,13 @@ class FunctionalDependencySet:
         return result
 
     def get_attributes_str(self):
-        return ", ".join(self.attributes)
+        return ", ".join(sorted(self.attributes))
 
     def get_dependencies_str(self):
         result = []
         for dependencie in self.dependencies:
             result.append(", ".join(dependencie[0]) + " --> " + ", ".join(dependencie[1]))
-        return "\n".join(result)
+        return "\n".join(sorted(result))
 
     def decompose(self):
         if self.is_decomposed:
