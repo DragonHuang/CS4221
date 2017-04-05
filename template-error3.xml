@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+   <entity name="create" id="1">
+      <attribute name="name" id="1" />
+      <attribute name="type" id="2" />
+      <key>1,2</key>
+   </entity>
+</data>

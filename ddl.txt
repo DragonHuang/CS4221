@@ -1,0 +1,185 @@
+template:
+CREATE TABLE Student (
+     SName varchar(32),
+     Matric varchar(32),
+     Matriculation_Date date,
+     UName varchar(32),
+     PRIMARY KEY (SName, Matric),
+     UNIQUE (SName, UName),
+     FOREIGN KEY (UName) REFERENCES University (UName)
+);
+
+CREATE TABLE University (
+     UName varchar(32),
+     PRIMARY KEY (UName)
+);
+
+template1:
+CREATE TABLE A (
+     name varchar(32),
+     type varchar(32),
+     PRIMARY KEY (name)
+);
+
+CREATE TABLE B (
+     B_name varchar(32),
+     B_type varchar(32),
+     PRIMARY KEY (B_name)
+);
+
+CREATE TABLE C (
+     C_name varchar(32),
+     C_type varchar(32),
+     PRIMARY KEY (C_name)
+);
+
+CREATE TABLE AB (
+     name varchar(32),
+     B_name varchar(32),
+     PRIMARY KEY (name, B_name),
+     FOREIGN KEY (name) REFERENCES A (name),
+     FOREIGN KEY (B_name) REFERENCES B (B_name)
+);
+
+CREATE TABLE BC (
+     B_name varchar(32),
+     C_name varchar(32),
+     PRIMARY KEY (B_name, C_name),
+     FOREIGN KEY (B_name) REFERENCES B (B_name),
+     FOREIGN KEY (C_name) REFERENCES C (C_name)
+);
+
+CREATE TABLE CA (
+     C_name varchar(32),
+     name varchar(32),
+     PRIMARY KEY (C_name, name),
+     FOREIGN KEY (C_name) REFERENCES C (C_name),
+     FOREIGN KEY (name) REFERENCES A (name)
+);
+
+ALTER TABLE A
+ADD COLUMN B_name varchar(32) REFERENCES B (B_name);
+
+DROP TABLE AB;
+
+ALTER TABLE B
+ADD COLUMN C_name varchar(32) REFERENCES C (C_name);
+
+DROP TABLE BC;
+
+ALTER TABLE C
+ADD COLUMN name varchar(32) REFERENCES A (name);
+
+DROP TABLE CA;
+
+template2:
+CREATE TABLE A (
+     name varchar(32),
+     type varchar(32),
+     AA_name varchar(32) REFERENCES A (name),
+     BB_name varchar(32) REFERENCES A (name),
+     PRIMARY KEY (name)
+);
+
+template3:
+CREATE TABLE A (
+     name varchar(32),
+     type varchar(32),
+     AA_name varchar(32),
+     AA_type varchar(32),
+     C varchar(32),
+     PRIMARY KEY (name, type),
+     FOREIGN KEY (AA_name, AA_type) REFERENCES A (name, type)
+);
+
+template4:
+CREATE TABLE A (
+     name varchar(32),
+     type varchar(32),
+     PRIMARY KEY (name, type)
+);
+
+CREATE TABLE B (
+     B_name varchar(32),
+     B_type varchar(32),
+     PRIMARY KEY (B_name)
+);
+
+CREATE TABLE C (
+     C_name varchar(32),
+     C_type varchar(32),
+     PRIMARY KEY (C_type)
+);
+
+CREATE TABLE D (
+     D_name varchar(32),
+     D_type varchar(32)
+);
+
+template5:
+CREATE TABLE A_AA (
+     name varchar(32),
+     type varchar(32),
+     AA_name varchar(32),
+     AA_type varchar(32),
+     AA_C varchar(32),
+     PRIMARY KEY (name, type),
+     FOREIGN KEY (AA_name, AA_type) REFERENCES A (name, type)
+);
+
+CREATE TABLE B (
+     B_name varchar(32),
+     B_type varchar(32),
+     PRIMARY KEY (B_name)
+);
+
+CREATE TABLE C (
+     C_name varchar(32),
+     C_type varchar(32),
+     PRIMARY KEY (C_type)
+);
+
+CREATE TABLE D (
+     D_name varchar(32),
+     D_type varchar(32)
+);
+
+CREATE TABLE AB (
+     C varchar(32),
+     name varchar(32),
+     type varchar(32),
+     B_name varchar(32),
+     PRIMARY KEY (name, type, B_name),
+     FOREIGN KEY (name, type) REFERENCES A_AA (name, type),
+     FOREIGN KEY (B_name) REFERENCES B (B_name)
+);
+
+CREATE TABLE AC (
+     name varchar(32),
+     type varchar(32),
+     C_type varchar(32),
+     PRIMARY KEY (name, type, C_type),
+     FOREIGN KEY (name, type) REFERENCES A_AA (name, type),
+     FOREIGN KEY (C_type) REFERENCES C (C_type)
+);
+
+CREATE TABLE AD (
+     AD_C varchar(32),
+     name varchar(32),
+     type varchar(32),
+     C_type varchar(32),
+     PRIMARY KEY (name, type, C_type),
+     FOREIGN KEY (name, type) REFERENCES A_AA (name, type),
+     FOREIGN KEY (C_type) REFERENCES C (C_type)
+);
+
+CREATE TABLE AD (
+     AD_C varchar(32),
+     name varchar(32),
+     type varchar(32),
+     D_name varchar(32),
+     D_type varchar(32),
+     PRIMARY KEY (name, type),
+     FOREIGN KEY (name, type) REFERENCES A_AA (name, type),
+     FOREIGN KEY (D_name, D_type) REFERENCES D (name, type)
+);
