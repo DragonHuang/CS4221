@@ -6,6 +6,20 @@ class DDLGenerator():
     ''' step one: fill in missing types,return to user for confirmation'''
     def fill_missing_type(self, dict, smart, database):
 
+        self.database = database
+
+        if database == 'psql':
+            self.reserved_keywords = self.psql_keywords
+        elif database == 'mysql':
+            self.reserved_keywords = self.mysql_keywords
+        elif database == 'oracle':
+            self.reserved_keywords = self.oracle_keywords
+        elif database == 'mssql':
+            self.database = database
+            self.reserved_keywords = self.mssql_keywords
+        else:
+            raise Exception('unsupported database management system: ' + database)
+
         entity_dict_list = dict['entity']
         for entity_dict in entity_dict_list:
             self.check_entity_attribute_types(entity_dict, smart, database)
@@ -17,9 +31,15 @@ class DDLGenerator():
         return dict
 
     def check_entity_attribute_types(self, entity_dict, smart, database):
+
+        entity_name = entity_dict['name']
+        self.check_for_keyword(entity_name)
+
         attr_dict_list = entity_dict['attribute']
         for attr_dict in attr_dict_list:
             if 'name' in attr_dict:
+                self.check_for_keyword(attr_dict['name'])
+
                 if 'type' not in attr_dict:
                     type = self.get_default_type(attr_dict['name'], smart, database)
                     attr_dict['type'] = type
@@ -30,9 +50,14 @@ class DDLGenerator():
 
     def check_relation_attribute_types(self, relation_dict, smart, database):
 
+        relation_name = relation_dict['name']
+        self.check_for_keyword(relation_name)
+
         attr_dict_list = relation_dict['attribute']
         for attr_dict in attr_dict_list:
             if 'name' in attr_dict:
+                self.check_for_keyword(attr_dict['name'])
+
                 if 'type' not in attr_dict:
                     type = self.get_default_type(attr_dict['name'], smart, database)
                     attr_dict['type'] = type
