@@ -14,6 +14,7 @@
     <script type="text/javascript" src="{% static 'js/jquery-1.10.2.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/he.js' %}"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'css/hr.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
     <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 </head>
 <body>
@@ -21,7 +22,8 @@
 <div class="container">
 
 <div class="page-header">
-    <h1>CS4221 <small>Entity-relationship to SQL DDL Generator</small></h1>
+    <h1>CS4221 </h1>
+    <h4>Entity-relationship to SQL DDL Generator</h4>
 </div>
 
 <div class="container">
@@ -43,7 +45,8 @@
         }
         result = he.decode(result).replace(new RegExp(escapeRegExp("###"), 'g'), "<br>");
         result = result.replace(new RegExp(escapeRegExp("****"), 'g'), "&nbsp;&nbsp;&nbsp;&nbsp;");
-        result = he.decode(result).replace(new RegExp(escapeRegExp("-----------------"), 'g'), "<hr class='hr'>");
+        result = he.decode(result).replace(new RegExp(escapeRegExp("$$$$"), 'g'), "<hr class='hr'>");
+        result = he.decode(result).replace(new RegExp(escapeRegExp("%%%%"), 'g'), "<hr class='hr2'>");
         $("#result").append(result);
     });
 

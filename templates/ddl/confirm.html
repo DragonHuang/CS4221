@@ -15,6 +15,7 @@
 
     <script type="text/javascript" src="{% static 'js/he.js' %}"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'css/dropdown.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
     <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 </head>
 <body>
@@ -22,7 +23,8 @@
 <div class="container">
 
 <div class="page-header">
-    <h1>CS4221 <small>Entity-relationship to SQL DDL Generator</small></h1>
+    <h1>CS4221 </h1>
+    <h4>Entity-relationship to SQL DDL Generator</h4>
 </div>
 
 <div class="container">
@@ -30,7 +32,10 @@
     <div class="col-md-7">
         <form id="form" method="post" enctype="multipart/form-data" action="/ddl/confirm" novalidate>
             {% csrf_token %}
-            {{form}}
+            {% for field in form %}
+                    <label class="l1" for="field.name">{{ field.label }}</label>
+                    {{ field }}
+            {% endfor %}
             <div id="selection"> </div>
             
             <p style="text-align: right; margin-top: 20px;">
@@ -59,10 +64,10 @@
 
         switch(DB) {
             case "psql":
-                list = '<ul><li><a href="#">VARCHAR(32)</a></li><li><a href="#">VARCHAR(64)</a></li><li><a href="#">INTEGER</a></li><li><a href="#">REAL</a></li><li><a href="#">DOUBLE PRECISION</a></li><li><a href="#">DATE</a></li><li><a href="#">TIME</a></li><li><a href="#">TIMESTAMP</a></li></ul>';
+                list = '<ul><li><a href="#">varchar(32)</a></li><li><a href="#">varchar(64)</a></li><li><a href="#">integer</a></li><li><a href="#">real</a></li><li><a href="#">double precision</a></li><li><a href="#">date</a></li><li><a href="#">time</a></li><li><a href="#">timestamp</a></li></ul>';
                 break;
             case "mysql":
-                list = '<ul><li><a href="#">VARCHAR(32)</a></li><li><a href="#">VARCHAR(64)</a></li><li><a href="#">INT</a></li><li><a href="#">FLOAT</a></li><li><a href="#">DOUBLE</a></li><li><a href="#">DATE</a></li><li><a href="#">DATETIME</a></li><li><a href="#">TIMESTAMP</a></li></ul>';
+                list = '<ul><li><a href="#">varchar(32)</a></li><li><a href="#">varchar(64)</a></li><li><a href="#">int</a></li><li><a href="#">float</a></li><li><a href="#">double</a></li><li><a href="#">date</a></li><li><a href="#">datetime</a></li><li><a href="#">timestamp</a></li></ul>';
                 break;
             case "oracle":
                 list = '<ul><li><a href="#">VARCHAR2</a></li><li><a href="#">NUMBER</a></li><li><a href="#">DATE</a></li><li><a href="#">TIMESTAMP</a></li></ul>';
@@ -78,11 +83,11 @@
 
         for(i=0; i< ER.entity.length;i++){
             var entity = ER.entity[i];
-            $("#selection").append("<p>"+entity.name+"</p><div>")
+            $("#selection").append("<hr class='hr2'><h4>"+entity.name+"</h4><div>")
             for(j=0; j<entity.attribute.length;j++){
                 var attr = entity.attribute[j];
                 if(typeof attr.type != "undefined")
-                $("#selection").append('<div class="dropdown" id="'+entity.name+'_'+attr.id+'">'+attr.name+' <p>'+attr.type+'</p>'+list+'</div> ');
+                $("#selection").append('<div class="dropdown l2" id="'+entity.name+'_'+attr.id+'">'+attr.name+' <p>'+attr.type+'</p>'+list+'</div> ');
             }
             $("#selection").append("</div>");
         }

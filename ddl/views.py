@@ -79,9 +79,9 @@ def confirm(request):
 
         bcnf_check = []
         check_bcnf = fdset.check_bcnf()
-        bcnf_check.append("-----------------\nIs in BCNF: " + str(len(check_bcnf) == 0))
-        bcnf_check.append("Attributes: \n" + fdset.get_attributes_str())
-        bcnf_check.append("Dependencies: \n" + fdset.get_dependencies_str())
+        bcnf_check.append("$$$$\n<h4>Is in BCNF: </h4>" + str(len(check_bcnf) == 0))
+        bcnf_check.append("%%%%Attributes: \n" + fdset.get_attributes_str())
+        bcnf_check.append("%%%%Dependencies: \n" + fdset.get_dependencies_str())
 
         if len(check_bcnf) > 0:
             error_str = [', '.join(d[0][0]) + ' --> ' + ', '.join(d[0][1])+ '\nError: ' + d[1] + '\n' for d in check_bcnf]
@@ -159,9 +159,9 @@ def upload_file(request):
 
                 bcnf_check = []
                 check_bcnf = fdset.check_bcnf()
-                bcnf_check.append("-----------------\nIs in BCNF: " + str(len(check_bcnf) == 0))
-                bcnf_check.append("Attributes: \n" + fdset.get_attributes_str())
-                bcnf_check.append("Dependencies: \n" + fdset.get_dependencies_str())
+                bcnf_check.append("$$$$\n<h4>Is in BCNF: </h4>" + str(len(check_bcnf) == 0))
+                bcnf_check.append("%%%%Attributes: \n" + fdset.get_attributes_str())
+                bcnf_check.append("%%%%Dependencies: \n" + fdset.get_dependencies_str())
 
                 if len(check_bcnf) > 0:
                     error_str = [', '.join(d[0][0]) + ' --> ' + ', '.join(d[0][1])+ '\nError: ' + d[1] + '\n' for d in check_bcnf]

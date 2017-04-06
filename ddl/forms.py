@@ -1,7 +1,10 @@
 from django import forms
 
 class UploadFileForm(forms.Form):
-    File = forms.FileField()
+    File = forms.FileField(
+        widget = forms.ClearableFileInput(attrs={"class":"file", "id":"file"}),
+        help_text = "<strong>Note:</strong> Please upload the corret XML file."
+    )
     
     Database = forms.ChoiceField(
         choices = (

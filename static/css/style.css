@@ -1,0 +1,43 @@
+h4 {
+font-size: 20px;
+display: inline;
+position: relative;
+letter-spacing: -1px; /* This will push it together giving us a nice 3D vibe */
+color: rgba(0,120,255,0.6); /* This will give us a blue at 50% opacity */
+}
+
+h4:after {
+content: “Anaglyph”;
+position: absolute;
+left: 8px; top: 6px; /* These are aligning it to be where we’d like relative to the last word */
+color: rgba (255,0,0,0.5); /* This gives us a red at 50% opacity */
+}
+
+h1 {
+font-size: 40px;
+font-family: somethingfancy_or_not, arial; /* These two can be anything you like */
+/* Here’s where the fun starts */
+-webkit-mask-image: -webkit-gradient(linear, left top, left bottom, from(rgba(0,0,0,1)), color-stop(50%, rgba(0,0,0,.5)), to (rgba(0,0,0,1)));
+}
+h1:after {
+content: “CSS3 Gradient”;
+color: #d6d6d6;
+text-shadow: 1px 2px 5px #000;
+}
+
+.l1 {
+font-size: 20px;
+display: inline;
+position: relative;
+letter-spacing: -1px; /* This will push it together giving us a nice 3D vibe */
+color: rgba(0,120,255,0.6); /* This will give us a blue at 50% opacity */
+}
+
+
+.l2 {
+font-size: 15px;
+display: inline;
+position: relative;
+letter-spacing: -1px; /* This will push it together giving us a nice 3D vibe */
+color: rgba(200,200,255,0.6); /* This will give us a blue at 50% opacity */
+}

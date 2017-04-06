@@ -2,7 +2,7 @@
 <data>
    <entity name="A" id="1">
       <attribute name="name" id="1" />
-      <attribute name="rating" id="2" />
+      <attribute name="date" id="2" />
       <key>1</key>
    </entity>
    <entity name="B" id="2">
