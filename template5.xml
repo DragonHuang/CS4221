@@ -24,16 +24,16 @@
       <attribute entity_id="2" max_participation="N" min_participation="1" />
       <attribute name="C"/> 
    </relationship>
-   <relationship name="AC" id="1">
+   <relationship name="AC" id="2">
       <attribute entity_id="1" max_participation="1" min_participation="1" />
       <attribute entity_id="3" max_participation="1" min_participation="1" />
    </relationship>
-   <relationship name="AD" id="1">
+   <relationship name="AD" id="3">
       <attribute entity_id="1" max_participation="1" min_participation="1" />
       <attribute entity_id="4" max_participation="1" min_participation="1" />
       <attribute name="C"/> 
    </relationship>
-   <relationship name="AA" id="1">
+   <relationship name="AA" id="4">
       <attribute entity_id="1" max_participation="1" min_participation="1" />
       <attribute name="C"/> 
    </relationship>
