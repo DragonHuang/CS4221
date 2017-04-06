@@ -544,8 +544,19 @@ class DDLGenerator():
                 type = primary_key_attr_type_list[i]
 
                 self.alter_table_list.append(
-                    "ALTER TABLE " + entity_name + "\nADD COLUMN " + name + " " + type + " REFERENCES " + foreign_entity_name + " (" + name + ");\n")
+                    "ALTER TABLE " + entity_name + "\nADD COLUMN " + name + " " + type + ";\n")
 
+            cur_str = ""
+            from_str = ""
+            for i in range(0, len(primary_key_attr_name_list)):
+                name = primary_key_attr_name_list[i].strip().replace(" ", "_")
+                cur_str += name + ", "
+                from_str += name + ", "
+
+            cur_str = cur_str[:-2]
+            from_str = from_str[:-2]
+
+            self.alter_table_list.append("ALTER TABLE " + entity_name + "\nADD FOREIGN KEY (" + cur_str + ") REFERENCES " + foreign_entity_name + "(" + from_str + ");\n")
             self.alter_table_list.append("DROP TABLE " + relationship_name + ";\n")
 
         else:
