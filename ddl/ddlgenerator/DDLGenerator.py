@@ -576,6 +576,7 @@ class DDLGenerator():
 
                 foreign_key_str = "    FOREIGN KEY (" + cur_str + ") REFERENCES " + entity_dict['name'] + "(" + from_str + "),\n"
                 foreign_key_str_list.append(foreign_key_str)
+                table.add_foreign_key(cur_lst, table.table_name, from_lst)
 
         if primary_key_str != "":
             ddl += primary_key_str
