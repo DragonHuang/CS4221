@@ -74,6 +74,20 @@ def confirm(request):
         print ER
         ddlObject = DDLGenerator()
         DDL = ddlObject.generate_ddl(ER, database)
+
+        fdset = ddlObject.Database.drived_fdset()
+
+        bcnf_check = []
+        check_bcnf = fdset.check_bcnf()
+        bcnf_check.append("-----------------\nIs in BCNF: " + str(len(check_bcnf) == 0))
+        bcnf_check.append("Attributes: \n" + fdset.get_attributes_str())
+        bcnf_check.append("Dependencies: \n" + fdset.get_dependencies_str())
+
+        if len(check_bcnf) > 0:
+            error_str = [', '.join(d[0][0]) + ' --> ' + ', '.join(d[0][1])+ '\nError: ' + d[1] + '\n' for d in check_bcnf]
+            bcnf_check.append("These dependencies are not valid: \n" + '\n'.join(error_str))
+        DDL.append('\n\n' + '\n\n'.join(bcnf_check))
+
         with open('IO/DDL', 'wb') as output:
             pickle.dump(DDL, output, pickle.HIGHEST_PROTOCOL)
         output.close()

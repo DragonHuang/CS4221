@@ -3,9 +3,7 @@ import xml.etree.ElementTree as ET
 def parseXML(f):
     tree = ET.parse(f)
     root = tree.getroot()
-    
-    # xmlstr = ET.tostring(root, encoding='utf8', method='xml')
-    # print(xmlstr)
+
     ER = {}
     ER['entity'] = [];
     for entity in root.findall('entity'):

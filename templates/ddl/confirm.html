@@ -58,16 +58,16 @@
 
         switch(DB) {
             case "psql":
-                list = '<ul><li><a href="#">VARCHAR(32)</a></li><li><a href="#">INTEGER</a></li><li><a href="#">REAL</a></li><li><a href="#">DOUBLE PRECISION</a></li><li><a href="#">DATE</a></li><li><a href="#">TIME</a></li><li><a href="#">TIMESTAMP</a></li></ul>';
+                list = '<ul><li><a href="#">VARCHAR(32)</a></li><li><a href="#">VARCHAR(64)</a></li><li><a href="#">INTEGER</a></li><li><a href="#">REAL</a></li><li><a href="#">DOUBLE PRECISION</a></li><li><a href="#">DATE</a></li><li><a href="#">TIME</a></li><li><a href="#">TIMESTAMP</a></li></ul>';
                 break;
             case "mysql":
-                list = '<ul><li><a href="#">VARCHAR(32)</a></li><li><a href="#">INT</a></li><li><a href="#">FLOAT</a></li><li><a href="#">DOUBLE</a></li><li><a href="#">DATE</a></li><li><a href="#">DATETIME</a></li><li><a href="#">TIMESTAMP</a></li></ul>';
+                list = '<ul><li><a href="#">VARCHAR(32)</a></li><li><a href="#">VARCHAR(64)</a></li><li><a href="#">INT</a></li><li><a href="#">FLOAT</a></li><li><a href="#">DOUBLE</a></li><li><a href="#">DATE</a></li><li><a href="#">DATETIME</a></li><li><a href="#">TIMESTAMP</a></li></ul>';
                 break;
             case "oracle":
-                list = '<ul><li><a href="#">VARCHAR2</a></li><li><a href="#">NUMBER</a></li><li><a href="#">NUMBER</a></li><li><a href="#">NUMBER</a></li><li><a href="#">DATE</a></li><li><a href="#">DATE</a></li><li><a href="#">TIMESTAMP</a></li></ul>';
+                list = '<ul><li><a href="#">VARCHAR2</a></li><li><a href="#">NUMBER</a></li><li><a href="#">DATE</a></li><li><a href="#">TIMESTAMP</a></li></ul>';
                 break;
             case "mssql":
-                list = '<ul><li><a href="#">VARCHAR(32)</a></li><li><a href="#">INT</a></li><li><a href="#">REAL</a></li><li><a href="#">FLOAT</a></li><li><a href="#">VARCHAR(64)</a></li><li><a href="#">VARCHAR(64)</a></li><li><a href="#">ROWVERSION</a></li></ul>';
+                list = '<ul><li><a href="#">VARCHAR(32)</a></li><li><a href="#">VARCHAR(64)</a></li><li><a href="#">INT</a></li><li><a href="#">REAL</a></li><li><a href="#">FLOAT</a></li><li><a href="#">ROWVERSION</a></li></ul>';
                 break;
             default:
         }
