@@ -26,6 +26,11 @@ def parseXML(f):
         temp_entity['key'] = []
         for key in entity.findall('key'):
             temp_entity['key'].append(key.text.split(','))
+        if not temp_entity['key']:
+            tempKey = []
+            for attribute in temp_entity['attribute']:
+                tempKey.append(attribute['id'])
+            temp_entity['key'].append(tempKey)
         ER['entity'].append(temp_entity)
 
     ER['relation'] = [];
