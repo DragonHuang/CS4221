@@ -1,11 +1,12 @@
 .dropdown {
-    width: 200px;
+    width: 320px;
     margin: 20px auto;
     position: relative;
 }
 .dropdown p {
-    width: 200px;
+    width: 320px;
     height: 20px;
+    margin: 0 0 0.2px;
     line-height: 24px;
     padding-left: 4px;
     padding-right: 30px;
@@ -15,7 +16,7 @@
     z-index: 200;
 }
 .dropdown ul {
-    width: 200px;
+    width: 320px;
     background: #e8f5fe;
     border: 1px solid #a9c9e2;
     position: absolute;

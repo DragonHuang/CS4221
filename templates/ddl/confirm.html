@@ -8,12 +8,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'css/dropdown.css' %}" />
+    
     <link rel="stylesheet" type="text/css" href="{% static 'font-awesome/css/font-awesome.min.css' %}" />
 
     <script type="text/javascript" src="{% static 'js/jquery-1.10.2.min.js' %}"></script>
 
     <script type="text/javascript" src="{% static 'js/he.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dropdown.css' %}" />
     <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 </head>
 <body>
@@ -25,8 +26,8 @@
 </div>
 
 <div class="container">
-    <div class="col-md-4"></div>
-    <div class="col-md-4">
+    <div class="col-md-2"></div>
+    <div class="col-md-7">
         <form id="form" method="post" enctype="multipart/form-data" action="/ddl/confirm" novalidate>
             {% csrf_token %}
             {{form}}
@@ -37,7 +38,7 @@
             </p>
         </form>
     </div>
-    <div class="col-md-4"></div>
+    <div class="col-md-2"></div>
 </div>
 
 <link rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/light-bootstrap/all.min.css" />
@@ -106,7 +107,8 @@
             console.log(txt);
             id = id.split('_');
 
-            data[id[0]] = [];
+            if (!(id[0] in data))
+                data[id[0]] = [];
             data[id[0]][id[1]] = txt;
 
             console.log(JSON.stringify(data));
