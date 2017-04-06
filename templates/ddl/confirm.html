@@ -15,6 +15,7 @@
 
     <script type="text/javascript" src="{% static 'js/he.js' %}"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'css/dropdown.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/hr.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
     <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 </head>
@@ -83,13 +84,16 @@
 
         for(i=0; i< ER.entity.length;i++){
             var entity = ER.entity[i];
-            $("#selection").append("<hr class='hr2'><h4>"+entity.name+"</h4><div>")
+            $("#selection").append("<hr class='hr3'>");
+            $("#selection").append("<h4>"+entity.name+"</h4><div>")
             for(j=0; j<entity.attribute.length;j++){
                 var attr = entity.attribute[j];
                 if(typeof attr.type != "undefined")
                 $("#selection").append('<div class="dropdown l2" id="'+entity.name+'_'+attr.id+'">'+attr.name+' <p>'+attr.type+'</p>'+list+'</div> ');
             }
             $("#selection").append("</div>");
+            $("#selection").append("<br><hr class='hr4'>");
+            
         }
             
         $(".dropdown p").click(function(){ 

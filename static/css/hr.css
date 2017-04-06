@@ -20,3 +20,21 @@ hr.hr2 {
     height: 1px;
     background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
 }
+
+hr.hr3 {
+    height: 15px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.45);
+    border-width: 1px 0 0 0;
+    border-radius: 8px;
+}
+
+hr.hr4 { 
+    display: block;
+    content: "";
+    height: 15px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.45);
+    border-width: 0 0 1px 0;
+    border-radius: 8px;
+}
