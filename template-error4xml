@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <data>
-   <entity name="A" id="1">
+   <entity name="create" id="1">
       <attribute name="name" id="1" />
       <attribute name="date" id="2" />
       <key>1</key>
