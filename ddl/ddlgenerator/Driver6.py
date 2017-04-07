@@ -52,7 +52,9 @@ class Driver6():
 
         ddlObject = DDLGenerator()
         new_dict = ddlObject.fill_missing_type(dict, True, 'psql')
-        ddlObject.generate_ddl(new_dict, "psql")
+        list = ddlObject.generate_ddl(new_dict, "psql")
+        for element in list:
+            print element
 
 if __name__ == "__main__":
         Driver6()

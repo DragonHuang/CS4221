@@ -46,5 +46,8 @@ class Driver8():
         new_dict = ddlObject.fill_missing_type(dict, True, 'psql')
         list = ddlObject.generate_ddl(new_dict, "psql")
 
+        for element in list:
+            print list
+
 if __name__ == "__main__":
         Driver8()
