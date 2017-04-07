@@ -25,7 +25,7 @@ SECRET_KEY = '$=q()!)+(lxbrh1l21-bn+dadq^8kr0)_^f_sf0h54ni_yjbdc'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost','*.poi.life']
 
 
 # Application definition
