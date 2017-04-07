@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '$=q()!)+(lxbrh1l21-bn+dadq^8kr0)_^f_sf0h54ni_yjbdc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost','*.poi.life']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost','*.poi.life', u'ddl.poi.life']
 
 
 # Application definition
