@@ -1,5 +1,4 @@
-# Group7 Topic4
-# SQL DDL Generator
+# Group7 Topic4 SQL DDL Generator
 
 * A0119392B Huang Weilong (Main framework and integration)
 * A0113594E Li Mengying  (ddl generator)
